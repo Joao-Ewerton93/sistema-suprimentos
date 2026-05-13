@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans,'Segoe UI',sans-serif); background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#161b2e; border-bottom:1px solid rgba(255,255,255,.07); }
+.brand { display:flex; align-items:center; gap:9px; }
+.brand-icon { width:29px; height:29px; border-radius:7px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.brand-name { font-size:14px; font-weight:500; color:#f1f5f9; }
+.brand-sub { font-size:10px; color:#64748b; }
+.topbar-btns { display:flex; gap:6px; }
+.btn-top { display:flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; background:#1e40af; color:#93c5fd; border:1px solid #3b82f6; font-size:11px; cursor:pointer; font-family:inherit; }
+.btn-top:hover { background:#2563eb; }
+.btn-top.ghost { background:#0f172a; color:#94a3b8; border-color:rgba(255,255,255,.1); }
+
+.metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:14px 20px; }
+.mc { background:#161b2e; border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:12px 15px; }
+.mc-label { font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.mc-val { font-size:22px; font-weight:500; }
+.mc-val.blue{color:#60a5fa}.mc-val.green{color:#34d399}.mc-val.amber{color:#fbbf24}.mc-val.red{color:#f87171}
+.mc-badge { display:inline-flex; font-size:10px; padding:2px 7px; border-radius:20px; margin-top:4px; }
+.badge-up{background:rgba(52,211,153,.12);color:#34d399}.badge-warn{background:rgba(251,191,36,.12);color:#fbbf24}
+
+.toolbar { display:flex; align-items:center; gap:7px; padding:0 20px 11px; flex-wrap:wrap; }
+.filter-btn { font-size:11px; padding:5px 11px; border-radius:6px; border:1px solid rgba(255,255,255,.1); background:transparent; color:#64748b; cursor:pointer; font-family:inherit; transition:all .15s; }
+.filter-btn.active { background:rgba(59,130,246,.15); border-color:#3b82f6; color:#93c5fd; }
+
+.table-wrap { padding:0 20px 24px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:11.5px; min-width:980px; }
+
+thead tr { background:#161b2e; }
+th {
+  padding:9px 10px; text-align:left; font-size:10px; font-weight:500; color:#64748b;
+  text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid rgba(255,255,255,.07);
+  white-space:nowrap; user-select:none;
+}
+th.sortable { cursor:pointer; }
+th.sortable:hover { color:#94a3b8; }
+th.sorted { color:#60a5fa; }
+.sort-arr { margin-left:3px; opacity:.4; }
+th.sorted .sort-arr { opacity:1; }
+
+tbody tr { border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:background .1s; }
+tbody tr:hover { background:rgba(255,255,255,.028); }
+td { padding:9px 10px; color:#cbd5e1; vertical-align:middle; white-space:nowrap; }
+
+/* accent stripe */
+.acc { width:3px; padding:0 !important; }
+.acc div { width:3px; min-height:36px; border-radius:2px; }
+
+/* pills */
+.pill { display:inline-flex; align-items:center; gap:4px; font-size:10px; padding:3px 9px; border-radius:20px; white-space:nowrap; font-weight:500; }
+.dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+/* action buttons inline */
+.act-wrap { display:flex; gap:5px; align-items:center; }
+.btn-act { font-size:10px; padding:4px 10px; border-radius:5px; border:none; cursor:pointer; font-family:inherit; font-weight:500; white-space:nowrap; transition:opacity .15s; }
+.btn-act:hover { opacity:.8; }
+.ba-apr { background:rgba(52,211,153,.16); color:#34d399; }
+.ba-conc { background:rgba(99,102,241,.18); color:#818cf8; }
+.ba-done { font-size:10px; color:#34d399; padding:0; background:none; border:none; cursor:default; }
+
+/* group rows */
+.group-row td { background:#0f1117; padding:5px 10px; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.7px; color:#475569; border-bottom:1px solid rgba(255,255,255,.05); cursor:default; }
+.group-row:hover { background:#0f1117 !important; cursor:default; }
+.group-count { margin-left:6px; font-size:10px; padding:1px 7px; border-radius:10px; }
+
+/* modal */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:100; align-items:center; justify-content:center; }
+.overlay.show { display:flex; }
+.modal { background:#1a2035; border:1px solid rgba(255,255,255,.12); border-radius:14px; width:500px; max-height:88vh; overflow-y:auto; padding:24px; }
+.mhdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
+.mtitle { font-size:15px; font-weight:500; color:#f1f5f9; }
+.msub { font-size:11px; color:#64748b; margin-top:3px; }
+.btnclose { background:none; border:none; color:#64748b; cursor:pointer; font-size:18px; }
+.mgrid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.msec { margin-bottom:12px; }
+.mlbl { font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.mval { font-size:13px; color:#cbd5e1; }
+.mdivider { height:1px; background:rgba(255,255,255,.07); margin:14px 0; }
+.macts { display:flex; gap:8px; }
+.btn-m { flex:1; padding:9px; border-radius:8px; border:none; font-size:13px; font-family:inherit; font-weight:500; cursor:pointer; }
+.btn-m:hover { opacity:.85; }
+.bm-apr { background:#059669; color:#fff; }
+.bm-conc { background:#4338ca; color:#fff; }
+.bm-done { background:#0f172a; color:#475569; cursor:default; }
+
+.toast { position:fixed; bottom:18px; right:18px; z-index:200; background:#1e293b; border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:11px 15px; font-size:12px; color:#e2e8f0; transform:translateY(60px); opacity:0; transition:all .25s; max-width:270px; }
+.toast.show { transform:translateY(0); opacity:1; }
+.empty-row td { text-align:center; padding:22px; color:#475569; font-size:12px; cursor:default; }
+.empty-row:hover { background:transparent !important; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">📦</div>
+    <div><div class="brand-name">SupplyFlow</div><div class="brand-sub">Sistema Kanban de Suprimentos</div></div>
+  </div>
+  <div class="topbar-btns">
+    <button class="btn-top" onclick="document.getElementById('file-upload').click()"><i class="ti ti-upload" style="font-size:13px"></i> Importar Arquivo</button>
+    <input type="file" id="file-upload" style="display:none" onchange="handleFileUpload(event)">
+    <button class="btn-top ghost" onclick="showToast('Relatório exportado!')"><i class="ti ti-download" style="font-size:13px"></i> Exportar</button>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="mc"><div class="mc-label">Pedidos esta semana</div><div class="mc-val blue">14</div><span class="mc-badge badge-up">↑ 3 vs semana anterior</span></div>
+  <div class="mc"><div class="mc-label">Concluídos</div><div class="mc-val green" id="m-ok">27</div><span class="mc-badge badge-up">↑ 89% taxa de conclusão</span></div>
+  <div class="mc"><div class="mc-label">Em cotação</div><div class="mc-val amber" id="m-cot">0</div><span class="mc-badge badge-warn">⚠ Aguardando fornecedor</span></div>
+  <div class="mc"><div class="mc-label">Pedidos em andamento</div><div class="mc-val red" id="m-and">0</div><span class="mc-badge badge-warn">⚠ Aguardando entrega</span></div>
+</div>
+
+<div class="toolbar">
+  <button class="filter-btn active" onclick="setFilter('todos',this)">Todos</button>
+  <button class="filter-btn" onclick="setFilter('cotacao',this)">Em cotação</button>
+  <button class="filter-btn" onclick="setFilter('forn_aprov',this)">Fornecedor aprovado</button>
+  <button class="filter-btn" onclick="setFilter('ped_aprov',this)">Pedido aprovado</button>
+  <button class="filter-btn" onclick="setFilter('andamento',this)">Em andamento</button>
+  <button class="filter-btn" onclick="setFilter('concluido',this)">Concluído</button>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th style="width:3px;padding:0"></th>
+      <th class="sortable" onclick="sortBy('id')">Id <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('eng')">Engenheiro <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('data')">Data <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('numSol')">Nº Solicitação <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('statusSol')">Status Solicitação <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('numPed')">Nº Pedido <span class="sort-arr">↕</span></th>
+      <th class="sortable" onclick="sortBy('statusPed')">Status Pedido <span class="sort-arr">↕</span></th>
+      <th style="cursor:default">Aprovação</th>
+      <th class="sortable" onclick="sortBy('prev')">Prev. Chegada <span class="sort-arr">↕</span></th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeOverlay()">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="mm-title">—</div><div class="msub" id="mm-sub">—</div></div>
+      <button class="btnclose" onclick="closeOverlay()">✕</button>
+    </div>
+    <div class="mgrid">
+      <div><div class="mlbl">Id</div><div class="mval" id="mm-id">—</div></div>
+      <div><div class="mlbl">Engenheiro</div><div class="mval" id="mm-eng">—</div></div>
+      <div><div class="mlbl">Data</div><div class="mval" id="mm-data">—</div></div>
+      <div><div class="mlbl">Nº Solicitação</div><div class="mval" id="mm-nsol">—</div></div>
+      <div><div class="mlbl">Nº Pedido</div><div class="mval" id="mm-nped">—</div></div>
+      <div><div class="mlbl">Previsão de Chegada</div><div class="mval" id="mm-prev">—</div></div>
+    </div>
+    <div class="msec"><div class="mlbl">Status da Solicitação</div><div id="mm-ssol">—</div></div>
+    <div class="msec"><div class="mlbl">Status do Pedido</div><div id="mm-sped">—</div></div>
+    <div class="mdivider"></div>
+    <div class="macts" id="mm-acts"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Status configs
+const SOL_STATUS = {
+  cotacao:    { label:'Em cotação',        color:'#fbbf24', dot:'#d97706' },
+  forn_aprov: { label:'Fornecedor aprovado', color:'#34d399', dot:'#059669' }
+};
+const PED_STATUS = {
+  ped_aprov:  { label:'Aprovado',     color:'#818cf8', dot:'#6366f1' },
+  andamento:  { label:'Em andamento', color:'#60a5fa', dot:'#2563eb' }
+};
+const FINAL_STATUS = {
+  aprovado:  { label:'Aprovado',  color:'#34d399', dot:'#059669' },
+  concluido: { label:'Concluído', color:'#94a3b8', dot:'#475569' }
+};
+
+// Each row: statusSol, statusPed, finalStatus (null until set)
+let rows = [];
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/requisicoes');
+    if(res.ok) {
+      rows = await res.json();
+      render();
+    }
+  } catch(e) { console.error('Erro ao buscar dados', e); }
+}
+
+async function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  showToast('Extraindo dados via Gemini...');
+  
+  // Para testes, vamos ler o arquivo como texto. 
+  // Em prod, usariamos FormData para enviar o PDF e o backend usaria PyPDF2.
+  const text = await file.text();
+  
+  try {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
+    });
+    if(res.ok) {
+      showToast('✓ Arquivo processado e registrado com sucesso!');
+      loadData();
+    } else {
+      showToast('Erro no processamento do arquivo.');
+    }
+  } catch(e) {
+    showToast('Erro de conexão com servidor.');
+  }
+}
+
+
+// Filter logic
+// Map filter key → which rows to show
+function filterFn(r) {
+  if (activeFilter==='todos')      return true;
+  if (activeFilter==='cotacao')    return r.statusSol==='cotacao';
+  if (activeFilter==='forn_aprov') return r.statusSol==='forn_aprov';
+  if (activeFilter==='ped_aprov')  return r.statusPed==='ped_aprov';
+  if (activeFilter==='andamento')  return r.statusPed==='andamento';
+  if (activeFilter==='concluido')  return r.finalStatus==='concluido';
+  return true;
+}
+
+let activeFilter = 'todos';
+let sortCol = null, sortDir = 1;
+let selectedId = null;
+
+function accentColor(r) {
+  if (r.finalStatus==='concluido') return '#475569';
+  if (r.finalStatus==='aprovado')  return '#34d399';
+  if (r.statusPed==='andamento')   return '#2563eb';
+  if (r.statusPed==='ped_aprov')   return '#6366f1';
+  if (r.statusSol==='forn_aprov')  return '#059669';
+  return '#d97706';
+}
+
+function solPill(s) {
+  const m = SOL_STATUS[s];
+  return `<span class="pill" style="background:${m.color}18;color:${m.color}"><span class="dot" style="background:${m.dot}"></span>${m.label}</span>`;
+}
+function pedPill(s) {
+  const m = PED_STATUS[s];
+  return `<span class="pill" style="background:${m.color}18;color:${m.color}"><span class="dot" style="background:${m.dot}"></span>${m.label}</span>`;
+}
+function finalPill(s) {
+  if (!s) return '<span style="color:#475569;font-size:11px">—</span>';
+  const m = FINAL_STATUS[s];
+  return `<span class="pill" style="background:${m.color}18;color:${m.color}"><span class="dot" style="background:${m.dot}"></span>${m.label}</span>`;
+}
+
+function actionCell(r) {
+  if (r.finalStatus==='concluido') return `<span class="ba-done">✓ Concluído</span>`;
+  if (r.finalStatus==='aprovado')
+    return `<div class="act-wrap"><button class="btn-act ba-conc" onclick="setConcluido(${r.id});event.stopPropagation()">Concluir</button></div>`;
+  return `<div class="act-wrap">
+    <button class="btn-act ba-apr"  onclick="setAprovado(${r.id});event.stopPropagation()">Aprovar</button>
+  </div>`;
+}
+
+function rowHtml(r) {
+  const ac = accentColor(r);
+  return `<tr onclick="openModal(${r.id})">
+    <td class="acc"><div style="background:${ac}"></div></td>
+    <td style="color:#94a3b8;font-size:11px;font-variant-numeric:tabular-nums;font-weight:500">#${String(r.id).padStart(3,'0')}</td>
+    <td style="color:#f1f5f9;font-weight:500">${r.eng}</td>
+    <td style="color:#64748b;font-variant-numeric:tabular-nums">${r.data}</td>
+    <td style="color:#64748b;font-size:11px;font-variant-numeric:tabular-nums">${r.numSol}</td>
+    <td>${solPill(r.statusSol)}</td>
+    <td style="color:#64748b;font-size:11px;font-variant-numeric:tabular-nums">${r.numPed}</td>
+    <td>${pedPill(r.statusPed)}</td>
+    <td>${actionCell(r)}</td>
+    <td style="color:#94a3b8;font-variant-numeric:tabular-nums">${r.prev}</td>
+  </tr>`;
+}
+
+function sorted(list) {
+  if (!sortCol) return list;
+  return [...list].sort((a,b)=>{
+    let av = sortCol==='id' ? a.id : (a[sortCol]||'');
+    let bv = sortCol==='id' ? b.id : (b[sortCol]||'');
+    if (sortCol==='data'||sortCol==='prev') { av=av.split('/').reverse().join(''); bv=bv.split('/').reverse().join(''); }
+    return av<bv ? -sortDir : av>bv ? sortDir : 0;
+  });
+}
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  const list = sorted(rows.filter(filterFn));
+  if (!list.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="10">Nenhuma requisição encontrada</td></tr>'; updateMetrics(); return; }
+  tbody.innerHTML = list.map(rowHtml).join('');
+  updateMetrics();
+}
+
+function updateMetrics() {
+  document.getElementById('m-cot').textContent = rows.filter(r=>r.statusSol==='cotacao').length;
+  document.getElementById('m-and').textContent = rows.filter(r=>r.statusPed==='andamento'&&r.finalStatus!=='concluido').length;
+  document.getElementById('m-ok').textContent  = 25 + rows.filter(r=>r.finalStatus==='concluido').length;
+}
+
+async function setAprovado(id) {
+  const r = rows.find(x=>x.id===id);
+  if (!r) return;
+  try {
+    const res = await fetch(`/api/requisicoes/${id}/aprovar`, { method: 'PUT' });
+    if(res.ok) {
+      showToast(`✓ #${String(id).padStart(3,'0')} marcado como Aprovado`);
+      await loadData();
+      const updatedR = rows.find(x=>x.id===id);
+      if (selectedId===id && updatedR) updateModal(updatedR);
+    }
+  } catch(e) { console.error(e); }
+}
+async function setConcluido(id) {
+  const r = rows.find(x=>x.id===id);
+  if (!r) return;
+  try {
+    const res = await fetch(`/api/requisicoes/${id}/concluir`, { method: 'PUT' });
+    if(res.ok) {
+      showToast(`✓ #${String(id).padStart(3,'0')} marcado como Concluído`);
+      await loadData();
+      const updatedR = rows.find(x=>x.id===id);
+      if (selectedId===id && updatedR) updateModal(updatedR);
+    }
+  } catch(e) { console.error(e); }
+}
+
+function openModal(id) {
+  const r = rows.find(x=>x.id===id);
+  if (!r) return;
+  selectedId = id;
+  updateModal(r);
+  document.getElementById('overlay').classList.add('show');
+}
+function updateModal(r) {
+  document.getElementById('mm-title').textContent = r.eng;
+  document.getElementById('mm-sub').textContent = r.numSol + ' · ' + r.numPed;
+  document.getElementById('mm-id').textContent = '#' + String(r.id).padStart(3,'0');
+  document.getElementById('mm-eng').textContent = r.eng;
+  document.getElementById('mm-data').textContent = r.data;
+  document.getElementById('mm-nsol').textContent = r.numSol;
+  document.getElementById('mm-nped').textContent = r.numPed;
+  document.getElementById('mm-prev').textContent = r.prev;
+  document.getElementById('mm-ssol').innerHTML = solPill(r.statusSol);
+  document.getElementById('mm-sped').innerHTML = pedPill(r.statusPed);
+  const acts = document.getElementById('mm-acts');
+  if (r.finalStatus==='concluido') {
+    acts.innerHTML = `<button class="btn-m bm-done">Concluído</button>`;
+  } else if (r.finalStatus==='aprovado') {
+    acts.innerHTML = `<button class="btn-m bm-conc" onclick="setConcluido(${r.id})">Marcar como Concluído</button>`;
+  } else {
+    acts.innerHTML = `<button class="btn-m bm-apr" onclick="setAprovado(${r.id})">✓ Aprovar</button>`;
+  }
+}
+function closeOverlay() { document.getElementById('overlay').classList.remove('show'); selectedId=null; }
+
+function setFilter(f,btn) {
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+const colKeys = [null,'id','eng','data','numSol','statusSol','numPed','statusPed',null,'prev'];
+function sortBy(col) {
+  if (sortCol===col) sortDir*=-1; else { sortCol=col; sortDir=1; }
+  document.querySelectorAll('th').forEach((th,i)=>{
+    th.classList.remove('sorted');
+    const a=th.querySelector('.sort-arr');
+    if(a) a.textContent='↕';
+    if(colKeys[i]===col) {
+      th.classList.add('sorted');
+      if(a) a.textContent=sortDir===1?'↑':'↓';
+    }
+  });
+  render();
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+loadData();
+</script>

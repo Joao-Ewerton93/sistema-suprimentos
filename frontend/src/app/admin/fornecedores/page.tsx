@@ -28,7 +28,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [ok]);
 
   if (ok === null || ok === false)
-    return <div className="min-h-screen bg-[#0d0f36] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#69d2cd]/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+    return <div className="min-h-screen bg-[#243C4C] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#698696]/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   return <>{children}</>;
 }
 
@@ -105,34 +105,34 @@ function FornecedoresPage() {
     return matchBusca && matchCat;
   });
 
-  const inputCls = "w-full bg-[#0d0f36] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-[#69d2cd] transition-all placeholder-slate-700";
+  const inputCls = "w-full bg-[#243C4C] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-[#698696] transition-all placeholder-slate-700";
 
   return (
-    <div className="min-h-screen bg-[#0d0f36] text-[#f1f6ce]/90 font-sans" translate="no">
+    <div className="min-h-screen bg-[#243C4C] text-[#F4FCFB]/90 font-sans" translate="no">
 
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-xs font-medium shadow-xl border
-          ${toast.type === 'success' ? 'bg-emerald-900/80 border-[#b9f1d6]/40 text-emerald-300' : 'bg-red-900/80 border-red-500/40 text-red-300'}`}>
+          ${toast.type === 'success' ? 'bg-emerald-900/80 border-[#ACBCBF]/40 text-emerald-300' : 'bg-red-900/80 border-red-500/40 text-red-300'}`}>
           {toast.type === 'success' ? '✓ ' : '✕ '}{toast.msg}
         </div>
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#294380] border-b border-white/5">
+      <header className="flex items-center justify-between px-5 py-3 bg-[#5289AD] border-b border-white/5">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-[#f1f6ce] tracking-wide">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-[#F4FCFB] tracking-wide">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Fornecedores</p>
           </div>
         </div>
         <nav className="flex items-center gap-1">
-          <a href="/admin" className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-[#69d2cd] hover:bg-[#b9f1d6] hover:text-[#0d0f36]/10 hover:border-[#69d2cd]/30 border border-transparent px-3 py-1.5 rounded-lg transition-all font-medium">
+          <a href="/admin" className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-[#698696] hover:bg-[#ACBCBF] hover:text-[#243C4C]/10 hover:border-[#698696]/30 border border-transparent px-3 py-1.5 rounded-lg transition-all font-medium">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
             Dashboard
           </a>
-          <a href="/admin/fornecedores" className="flex items-center gap-1.5 text-[10px] text-[#b9f1d6] bg-[#b9f1d6]/10 border border-[#b9f1d6]/30 px-3 py-1.5 rounded-lg font-medium">
+          <a href="/admin/fornecedores" className="flex items-center gap-1.5 text-[10px] text-[#ACBCBF] bg-[#ACBCBF]/10 border border-[#ACBCBF]/30 px-3 py-1.5 rounded-lg font-medium">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             Fornecedores
           </a>
@@ -152,11 +152,11 @@ function FornecedoresPage() {
         {/* Título + botão */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-[#f1f6ce]">Fornecedores</h2>
+            <h2 className="text-base font-semibold text-[#F4FCFB]">Fornecedores</h2>
             <p className="text-[11px] text-slate-500 mt-0.5">{fornecedores.length} fornecedor(es) cadastrado(s)</p>
           </div>
           <button onClick={openCreate}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#b9f1d6]/80 text-[#0d0f36]/20 text-[#b9f1d6] border border-[#b9f1d6]/30 hover:bg-[#b9f1d6]/80 text-[#0d0f36]/30 text-xs font-medium transition-all">
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#ACBCBF]/80 text-[#243C4C]/20 text-[#ACBCBF] border border-[#ACBCBF]/30 hover:bg-[#ACBCBF]/80 text-[#243C4C]/30 text-xs font-medium transition-all">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Novo Fornecedor
           </button>
@@ -168,10 +168,10 @@ function FornecedoresPage() {
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" placeholder="Buscar por nome, CNPJ ou contato..." value={busca}
               onChange={e => setBusca(e.target.value)}
-              className="w-full bg-[#294380] border border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-300 outline-none focus:border-[#69d2cd] transition-all placeholder-slate-700" />
+              className="w-full bg-[#5289AD] border border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-300 outline-none focus:border-[#698696] transition-all placeholder-slate-700" />
           </div>
           <select value={filtroCategoria} onChange={e => setFiltroCategoria(e.target.value)}
-            className="bg-[#294380] border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-400 outline-none focus:border-[#69d2cd] transition-all">
+            className="bg-[#5289AD] border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-400 outline-none focus:border-[#698696] transition-all">
             <option value="todas">Todas as categorias</option>
             {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -191,20 +191,20 @@ function FornecedoresPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map(f => (
-              <div key={f.id} className="bg-[#294380] border border-white/5 rounded-xl p-4 hover:border-white/10 transition-all group">
+              <div key={f.id} className="bg-[#5289AD] border border-white/5 rounded-xl p-4 hover:border-white/10 transition-all group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#b9f1d6]/10 border border-[#b9f1d6]/20 flex items-center justify-center text-[#b9f1d6] font-bold text-sm shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-[#ACBCBF]/10 border border-[#ACBCBF]/20 flex items-center justify-center text-[#ACBCBF] font-bold text-sm shrink-0">
                       {f.nome.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#f1f6ce] leading-tight">{f.nome}</p>
+                      <p className="text-sm font-semibold text-[#F4FCFB] leading-tight">{f.nome}</p>
                       {f.cnpj && <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.cnpj}</p>}
                     </div>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(f)} title="Editar"
-                      className="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-[#69d2cd] hover:bg-[#b9f1d6] hover:text-[#0d0f36]/10 transition-all">
+                      className="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-[#698696] hover:bg-[#ACBCBF] hover:text-[#243C4C]/10 transition-all">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
                     <button onClick={() => setConfirmDelete(f)} title="Excluir"
@@ -215,7 +215,7 @@ function FornecedoresPage() {
                 </div>
 
                 {f.categoria && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#69d2cd]/10 text-[#69d2cd] border border-[#69d2cd]/20 mb-3">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#698696]/10 text-[#698696] border border-[#698696]/20 mb-3">
                     {f.categoria}
                   </span>
                 )}
@@ -236,7 +236,7 @@ function FornecedoresPage() {
                   {f.email && (
                     <div className="flex items-center gap-2 text-slate-500">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                      <a href={`mailto:${f.email}`} className="text-[#69d2cd] hover:underline truncate">{f.email}</a>
+                      <a href={`mailto:${f.email}`} className="text-[#698696] hover:underline truncate">{f.email}</a>
                     </div>
                   )}
                   {f.observacoes && (
@@ -252,9 +252,9 @@ function FornecedoresPage() {
       {/* Modal de cadastro/edição */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#294380] border border-white/8 rounded-2xl w-full max-w-lg shadow-2xl">
+          <div className="bg-[#5289AD] border border-white/8 rounded-2xl w-full max-w-lg shadow-2xl">
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-              <h3 className="text-sm font-semibold text-[#f1f6ce]">
+              <h3 className="text-sm font-semibold text-[#F4FCFB]">
                 {editando ? 'Editar Fornecedor' : 'Novo Fornecedor'}
               </h3>
               <button onClick={() => setShowModal(false)} className="text-slate-600 hover:text-slate-300 transition-colors">
@@ -308,7 +308,7 @@ function FornecedoresPage() {
                   Cancelar
                 </button>
                 <button type="submit" disabled={loading}
-                  className="flex-1 py-2 rounded-lg bg-[#b9f1d6]/80 text-[#0d0f36]/30 hover:bg-[#b9f1d6]/80 text-[#0d0f36]/50 border border-[#b9f1d6]/30 text-[#b9f1d6] text-xs font-medium transition-all disabled:opacity-50">
+                  className="flex-1 py-2 rounded-lg bg-[#ACBCBF]/80 text-[#243C4C]/30 hover:bg-[#ACBCBF]/80 text-[#243C4C]/50 border border-[#ACBCBF]/30 text-[#ACBCBF] text-xs font-medium transition-all disabled:opacity-50">
                   {loading ? 'Salvando...' : editando ? 'Salvar Alterações' : 'Cadastrar Fornecedor'}
                 </button>
               </div>
@@ -320,11 +320,11 @@ function FornecedoresPage() {
       {/* Modal de confirmação de exclusão */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#294380] border border-red-500/20 rounded-2xl w-full max-w-sm shadow-2xl p-5 text-center">
+          <div className="bg-[#5289AD] border border-red-500/20 rounded-2xl w-full max-w-sm shadow-2xl p-5 text-center">
             <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-3">
               <svg width="20" height="20" className="text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </div>
-            <p className="text-sm font-semibold text-[#f1f6ce] mb-1">Excluir fornecedor?</p>
+            <p className="text-sm font-semibold text-[#F4FCFB] mb-1">Excluir fornecedor?</p>
             <p className="text-xs text-slate-500 mb-4">"{confirmDelete.nome}" será removido permanentemente.</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDelete(null)}

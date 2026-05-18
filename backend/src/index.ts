@@ -96,7 +96,7 @@ app.post('/api/usuarios/registrar', async (req, res) => {
         const { data, error } = await supabase
             .from('usuarios')
             .insert([{ nome, email, senha: hash }])
-            .select('id, nome, email');
+            .select('id, nome, email, role');
 
         if (error) {
             if (error.code === '23505') return res.status(400).json({ error: 'E-mail já cadastrado.' });
@@ -104,7 +104,7 @@ app.post('/api/usuarios/registrar', async (req, res) => {
         }
 
         const user = data[0];
-        const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ success: true, user, token });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
@@ -127,8 +127,8 @@ app.post('/api/usuarios/login', async (req, res) => {
         const valid = await bcrypt.compare(senha, data.senha);
         if (!valid) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
 
-        const token = jwt.sign({ id: data.id, nome: data.nome, email: data.email }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ success: true, user: { id: data.id, nome: data.nome, email: data.email }, token });
+        const token = jwt.sign({ id: data.id, nome: data.nome, email: data.email, role: data.role }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ success: true, user: { id: data.id, nome: data.nome, email: data.email, role: data.role }, token });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
@@ -166,15 +166,19 @@ app.get('/api/requisicoes', async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         let userId = null;
+        let userRole = null;
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1];
-            try { userId = (jwt.verify(token, JWT_SECRET) as any).id; } 
-            catch { return res.status(401).json({ error: 'Sessão expirada.' }); }
+            try { 
+                const decoded = jwt.verify(token, JWT_SECRET) as any;
+                userId = decoded.id;
+                userRole = decoded.role;
+            } catch { return res.status(401).json({ error: 'Sessão expirada.' }); }
         }
 
         let query = supabase.from('requisicoes').select('*').order('id', { ascending: false });
-        // Se houver um usuário logado no portal (Bearer token), filtra apenas os pedidos dele
-        if (userId) {
+        // Se houver um usuário logado no portal e ele NÃO for admin, filtra apenas os pedidos dele
+        if (userId && userRole !== 'admin') {
             query = query.eq('usuario_id', userId);
         }
 

@@ -6,7 +6,7 @@ const UNIDADES = ['UND','M','M²','M³','KG','L','CX','PCT','PR','GL'];
 
 type Item = { descricao: string; unidade: string; quantidade: number; };
 type Req  = { id: number; engenheiro: string; data: string; numero_solicitacao: string; status_solicitacao: string; status_final: string | null; };
-type User = { id: number; nome: string; email: string; };
+type User = { id: number; nome: string; email: string; role?: string; };
 
 const STATUS_MAP: Record<string, {label:string;dot:string;text:string}> = {
   pendente:     {label:'Pendente',   dot:'bg-amber-400 animate-pulse', text:'text-amber-400'},
@@ -220,7 +220,12 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
               {user.nome.charAt(0).toUpperCase()}
             </div>
             <div className="hidden sm:block">
-              <p className="text-[11px] text-slate-300 font-medium">{user.nome}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[11px] text-slate-300 font-medium">{user.nome}</p>
+                {user.role === 'admin' && (
+                  <span className="bg-emerald-500/20 text-emerald-400 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Admin</span>
+                )}
+              </div>
               <button onClick={onLogout} className="text-[9px] text-red-400 hover:underline">Sair da conta</button>
             </div>
           </div>
@@ -341,8 +346,8 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-slate-100 mb-1">Meu Histórico de Pedidos</h2>
-          <p className="text-xs text-slate-500 mb-5">Suas requisições enviadas ao painel administrativo.</p>
+          <h2 className="text-base font-semibold text-slate-100 mb-1">{user.role === 'admin' ? 'Todas as Requisições' : 'Meu Histórico de Pedidos'}</h2>
+          <p className="text-xs text-slate-500 mb-5">{user.role === 'admin' ? 'Visão de administrador. Exibindo requisições de todos os engenheiros.' : 'Suas requisições enviadas ao painel administrativo.'}</p>
           <div className="bg-[#161b2e] border border-white/5 rounded-2xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>

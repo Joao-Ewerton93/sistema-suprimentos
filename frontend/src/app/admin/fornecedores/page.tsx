@@ -13,6 +13,7 @@ const CATEGORIAS = ['Materiais de Construção', 'Elétrica', 'Hidráulica', 'Fe
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const [ok, setOk] = useState<boolean | null>(null);
+
   useEffect(() => {
     const token = sessionStorage.getItem('sf_token');
     if (!token) { setOk(false); return; }
@@ -21,10 +22,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ token }),
     }).then(r => r.json()).then(j => setOk(!!j.valid)).catch(() => setOk(false));
   }, []);
-  if (ok === null) return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
-  if (!ok) { if (typeof window !== 'undefined') window.location.href = '/admin'; return null; }
+
+  useEffect(() => {
+    if (ok === false) window.location.href = '/admin';
+  }, [ok]);
+
+  if (ok === null || ok === false)
+    return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   return <>{children}</>;
 }
+
 
 const emptyForm = { nome: '', cnpj: '', contato: '', email: '', telefone: '', categoria: '', observacoes: '' };
 

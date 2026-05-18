@@ -30,7 +30,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [ok]);
 
   if (ok === null || ok === false)
-    return <div className="min-h-screen bg-[#243C4C] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#698696]/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+    return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   return <>{children}</>;
 }
 
@@ -274,25 +274,25 @@ function RelatoriosPage() {
     finally { setExporting(null); }
   };
 
-  const inputCls = "bg-[#243C4C] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-[#698696] transition-all w-full placeholder-slate-700";
+  const inputCls = "bg-[#0f1117] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-blue-500 transition-all w-full placeholder-slate-700";
 
   return (
-    <div className="min-h-screen bg-[#243C4C] text-[#F4FCFB]/90 font-sans" translate="no">
+    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans" translate="no">
 
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-xs font-medium shadow-xl border
-          ${toast.type === 'success' ? 'bg-emerald-900/80 border-[#ACBCBF]/40 text-emerald-300' : 'bg-red-900/80 border-red-500/40 text-red-300'}`}>
+          ${toast.type === 'success' ? 'bg-emerald-900/80 border-emerald-500/40 text-emerald-300' : 'bg-red-900/80 border-red-500/40 text-red-300'}`}>
           {toast.type === 'success' ? '✓ ' : '✕ '}{toast.msg}
         </div>
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#5289AD] border-b border-white/5">
+      <header className="flex items-center justify-between px-5 py-3 bg-[#161b2e] border-b border-white/5">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-[#F4FCFB] tracking-wide">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Relatórios e Exportação</p>
           </div>
         </div>
@@ -309,12 +309,12 @@ function RelatoriosPage() {
         {/* Título */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-[#F4FCFB]">Relatório de Requisições</h2>
+            <h2 className="text-base font-semibold text-slate-100">Relatório de Requisições</h2>
             <p className="text-[11px] text-slate-500 mt-0.5">Filtre, visualize e exporte os dados em PDF ou Excel</p>
           </div>
           <div className="flex gap-2">
             <button onClick={exportExcel} disabled={!!exporting || loading || filtered.length === 0}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ACBCBF]/80 text-[#243C4C]/20 text-[#ACBCBF] border border-[#ACBCBF]/30 text-xs font-medium hover:bg-[#ACBCBF]/80 text-[#243C4C]/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs font-medium hover:bg-emerald-600/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
               {exporting === 'excel' ? (
                 <span className="flex items-center gap-2"><span className="w-3.5 h-3.5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />Exportando...</span>
               ) : (
@@ -333,7 +333,7 @@ function RelatoriosPage() {
         </div>
 
         {/* Filtros */}
-        <div className="bg-[#5289AD] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#161b2e] border border-white/5 rounded-xl p-4">
           <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-3 font-medium">Filtros</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
@@ -369,13 +369,13 @@ function RelatoriosPage() {
         {/* Métricas */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: 'Total', value: metrics.total, color: 'text-[#698696]', border: 'border-[#698696]/20' },
+            { label: 'Total', value: metrics.total, color: 'text-blue-400', border: 'border-blue-500/20' },
             { label: 'Pendentes', value: metrics.pendente, color: 'text-amber-400', border: 'border-amber-500/20' },
-            { label: 'Aprovados', value: metrics.aprovado, color: 'text-[#ACBCBF]', border: 'border-[#ACBCBF]/20' },
+            { label: 'Aprovados', value: metrics.aprovado, color: 'text-emerald-400', border: 'border-emerald-500/20' },
             { label: 'A Caminho', value: metrics.a_caminho, color: 'text-indigo-400', border: 'border-indigo-500/20' },
             { label: 'Finalizados', value: metrics.finalizado, color: 'text-teal-400', border: 'border-teal-500/20' },
           ].map(({ label, value, color, border }) => (
-            <div key={label} className={`bg-[#5289AD] border ${border} rounded-xl p-4`}>
+            <div key={label} className={`bg-[#161b2e] border ${border} rounded-xl p-4`}>
               <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{label}</div>
               <div className={`text-2xl font-semibold ${color}`}>{value}</div>
             </div>
@@ -383,7 +383,7 @@ function RelatoriosPage() {
         </div>
 
         {/* Tabela de preview */}
-        <div className="bg-[#5289AD] border border-white/5 rounded-xl overflow-hidden">
+        <div className="bg-[#161b2e] border border-white/5 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
             <p className="text-xs font-medium text-slate-300">Pré-visualização — {filtered.length} registro(s)</p>
             {loading && <span className="text-[10px] text-slate-600 animate-pulse">Carregando...</span>}
@@ -412,13 +412,13 @@ function RelatoriosPage() {
                   const stColor: Record<string, string> = {
                     'Finalizado': 'text-teal-400 bg-teal-500/10 border-teal-500/20',
                     'A Caminho': 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-                    'Aprovado': 'text-[#ACBCBF] bg-[#ACBCBF]/10 border-[#ACBCBF]/20',
+                    'Aprovado': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
                     'Pendente': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
                   };
                   return (
                     <tr key={r.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
                       <td className="px-4 py-2.5 text-slate-600 font-mono">#{String(i + 1).padStart(3, '0')}</td>
-                      <td className="px-4 py-2.5 text-[#F4FCFB]/90">{r.engenheiro || '—'}</td>
+                      <td className="px-4 py-2.5 text-slate-200">{r.engenheiro || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.data || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.numero_solicitacao || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.numero_pedido || '—'}</td>

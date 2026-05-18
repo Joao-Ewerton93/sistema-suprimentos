@@ -20,7 +20,7 @@ export async function extractDataFromFile(fileBuffer: Buffer, mimeType: string):
         
         Estrutura obrigatória:
         {
-            "solicitante": "Procure o nome preenchido abaixo da palavra 'ENGENHEIRO' no rodapé do documento (ex: GLAYBSON)",
+            "solicitante": "Procure o nome preenchido abaixo da palavra 'ENGENHEIRO' no rodapé do documento (ex: GLEYBSON)",
             "data": "A data exata que está ao lado do campo 'DATA' no topo (ex: 21/2/2026)",
             "numero_solicitacao": "O número que aparece no título do documento após 'REQUISIÇÃO DE MATERIAL Nº' (ex: 2026-01). NÃO pegue códigos do meio da tabela como PS-021."
         }`;

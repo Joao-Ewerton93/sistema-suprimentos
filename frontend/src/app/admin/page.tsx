@@ -232,28 +232,22 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             <p className="text-[10px] text-slate-500">Painel Administrativo</p>
           </div>
         </div>
-        <div className="flex gap-2 items-center">
-          <a href="/admin/relatorios" className="flex items-center gap-1.5 text-[10px] text-violet-400 hover:text-violet-300 border border-violet-500/30 hover:border-violet-500/60 bg-violet-500/10 hover:bg-violet-500/20 px-3 py-1.5 rounded-lg transition-all font-medium">
+        {/* Navegação */}
+        <nav className="flex items-center gap-1">
+          <a href="/admin"
+            className="flex items-center gap-1.5 text-[10px] text-blue-400 bg-blue-500/10 border border-blue-500/30 px-3 py-1.5 rounded-lg font-medium">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+          <a href="/admin/relatorios"
+            className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-violet-400 hover:bg-violet-500/10 hover:border-violet-500/30 border border-transparent px-3 py-1.5 rounded-lg transition-all font-medium">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             Relatórios
           </a>
+          <div className="w-px h-5 bg-white/8 mx-1" />
           <a href="/" className="text-[10px] text-slate-600 hover:text-slate-400 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
-          {selectedIds.length > 0 && (
-            <button onClick={handleBulkDelete} title="Excluir Selecionados"
-              className="flex items-center justify-center w-8 h-8 rounded-md bg-red-600/20 text-red-500 border border-red-500/30 hover:bg-red-600/40 transition-all">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </button>
-          )}
-          <button onClick={criarNovaRequisicao} disabled={loading}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs font-medium hover:bg-emerald-600/30 transition-all disabled:opacity-50">
-            + Novo Pedido
-          </button>
-          <label className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-800/80 text-blue-200 border border-blue-500/50 text-xs cursor-pointer hover:bg-blue-600 transition-colors">
-            <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" className="hidden" onChange={handleFileUpload} />
-            Importar IA
-          </label>
-          <button onClick={onLogout} title="Sair" className="text-slate-600 hover:text-slate-400 text-xs px-2 py-1.5 border border-white/5 rounded-lg hover:border-white/10 transition-all">Sair</button>
-        </div>
+          <button onClick={onLogout} className="text-[10px] text-slate-600 hover:text-red-400 hover:border-red-500/20 border border-white/5 px-3 py-1.5 rounded-lg transition-all">Sair</button>
+        </nav>
       </header>
 
       {/* Metrics */}
@@ -273,15 +267,38 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 px-5 pb-3">
-        {['todos', 'pendente', 'aprovado'].map(f => (
-          <button key={f} onClick={() => setFilter(f)}
-            className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium
-              ${filter === f ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'bg-transparent border-white/5 text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
-            {f === 'todos' ? 'Todos' : f.charAt(0).toUpperCase() + f.slice(1)}
+      {/* Barra de ações + Filtros */}
+      <div className="flex items-center justify-between px-5 pb-3">
+        {/* Filtros de status */}
+        <div className="flex gap-1.5">
+          {['todos', 'pendente', 'aprovado'].map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium
+                ${filter === f ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'bg-transparent border-white/5 text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
+              {f === 'todos' ? 'Todos' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+        {/* Ações */}
+        <div className="flex items-center gap-2">
+          {selectedIds.length > 0 && (
+            <button onClick={handleBulkDelete}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600/30 text-xs font-medium transition-all">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Excluir ({selectedIds.length})
+            </button>
+          )}
+          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#161b2e] text-slate-400 border border-white/8 hover:border-blue-500/40 hover:text-blue-400 text-xs font-medium cursor-pointer transition-all">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Importar IA
+            <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" className="hidden" onChange={handleFileUpload} />
+          </label>
+          <button onClick={criarNovaRequisicao} disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 text-xs font-medium transition-all disabled:opacity-50">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Pedido
           </button>
-        ))}
+        </div>
       </div>
 
       {/* Table */}

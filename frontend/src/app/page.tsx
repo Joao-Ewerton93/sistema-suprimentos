@@ -6,7 +6,7 @@ const UNIDADES = ['UND','M','M²','M³','KG','L','CX','PCT','PR','GL'];
 
 type Item = { descricao: string; unidade: string; quantidade: number; };
 type Req  = { id: number; engenheiro: string; data: string; numero_solicitacao: string; status_solicitacao: string; status_final: string | null; };
-type User = { id: number; nome: string; email: string; role?: string; };
+type User = { id: number; nome: string; usuario: string; role?: string; };
 
 const STATUS_MAP: Record<string, {label:string;dot:string;text:string}> = {
   pendente:     {label:'Pendente',   dot:'bg-amber-400 animate-pulse', text:'text-amber-400'},
@@ -38,7 +38,7 @@ export default function App() {
 
   // Form de Autenticação
   const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
+  const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -56,7 +56,7 @@ export default function App() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading(true);
     const endpoint = authMode === 'login' ? '/api/usuarios/login' : '/api/usuarios/registrar';
-    const body = authMode === 'login' ? { email, senha } : { nome, email, senha };
+    const body = authMode === 'login' ? { usuario, senha } : { nome, usuario, senha };
     try {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -113,9 +113,9 @@ export default function App() {
                 </div>
               )}
               <div>
-                <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">E-mail</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="joao@engenharia.com" autoFocus={isLogin}
+                <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Usuário de Login</label>
+                <input type="text" required value={usuario} onChange={e => setUsuario(e.target.value)}
+                  placeholder="Seu usuário" autoFocus={isLogin}
                   className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
               </div>
               <div>

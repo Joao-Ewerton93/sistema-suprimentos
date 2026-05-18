@@ -89,22 +89,22 @@ app.post('/api/auth/verify', (req, res) => {
 
 app.post('/api/usuarios/registrar', async (req, res) => {
     try {
-        const { nome, email, senha } = req.body;
-        if (!nome || !email || !senha) return res.status(400).json({ error: 'Preencha todos os campos.' });
+        const { nome, usuario, senha } = req.body;
+        if (!nome || !usuario || !senha) return res.status(400).json({ error: 'Preencha todos os campos.' });
 
         const hash = await bcrypt.hash(senha, 10);
         const { data, error } = await supabase
             .from('usuarios')
-            .insert([{ nome, email, senha: hash }])
-            .select('id, nome, email, role');
+            .insert([{ nome, usuario, senha: hash }])
+            .select('id, nome, usuario, role');
 
         if (error) {
-            if (error.code === '23505') return res.status(400).json({ error: 'E-mail já cadastrado.' });
+            if (error.code === '23505') return res.status(400).json({ error: 'Usuário já cadastrado.' });
             throw error;
         }
 
         const user = data[0];
-        const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user.id, nome: user.nome, usuario: user.usuario, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ success: true, user, token });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
@@ -113,22 +113,22 @@ app.post('/api/usuarios/registrar', async (req, res) => {
 
 app.post('/api/usuarios/login', async (req, res) => {
     try {
-        const { email, senha } = req.body;
-        if (!email || !senha) return res.status(400).json({ error: 'Preencha e-mail e senha.' });
+        const { usuario, senha } = req.body;
+        if (!usuario || !senha) return res.status(400).json({ error: 'Preencha usuário e senha.' });
 
         const { data, error } = await supabase
             .from('usuarios')
             .select('*')
-            .eq('email', email)
+            .eq('usuario', usuario)
             .single();
 
-        if (error || !data) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+        if (error || !data) return res.status(401).json({ error: 'Usuário ou senha incorretos.' });
 
         const valid = await bcrypt.compare(senha, data.senha);
-        if (!valid) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+        if (!valid) return res.status(401).json({ error: 'Usuário ou senha incorretos.' });
 
-        const token = jwt.sign({ id: data.id, nome: data.nome, email: data.email, role: data.role }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ success: true, user: { id: data.id, nome: data.nome, email: data.email, role: data.role }, token });
+        const token = jwt.sign({ id: data.id, nome: data.nome, usuario: data.usuario, role: data.role }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ success: true, user: { id: data.id, nome: data.nome, usuario: data.usuario, role: data.role }, token });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

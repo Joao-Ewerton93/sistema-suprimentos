@@ -2,12 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import multer from 'multer';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { supabase } from './database/supabase';
 import { extractDataFromFile } from './services/gemini.service';
 
 dotenv.config();
 
 const app = express();
+const JWT_SECRET = process.env.JWT_SECRET || 'supplyflow-dev-secret-key-2026';
 
 // CORS: aceita localhost em dev e a URL do frontend em produção
 const allowedOrigins = [
@@ -80,6 +83,57 @@ app.post('/api/auth/verify', (req, res) => {
     res.json({ valid: token === expected });
 });
 
+// ══════════════════════════════════════════════════════════
+// USUÁRIOS (PORTAL)
+// ══════════════════════════════════════════════════════════
+
+app.post('/api/usuarios/registrar', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body;
+        if (!nome || !email || !senha) return res.status(400).json({ error: 'Preencha todos os campos.' });
+
+        const hash = await bcrypt.hash(senha, 10);
+        const { data, error } = await supabase
+            .from('usuarios')
+            .insert([{ nome, email, senha: hash }])
+            .select('id, nome, email');
+
+        if (error) {
+            if (error.code === '23505') return res.status(400).json({ error: 'E-mail já cadastrado.' });
+            throw error;
+        }
+
+        const user = data[0];
+        const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.status(201).json({ success: true, user, token });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/usuarios/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+        if (!email || !senha) return res.status(400).json({ error: 'Preencha e-mail e senha.' });
+
+        const { data, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !data) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+
+        const valid = await bcrypt.compare(senha, data.senha);
+        if (!valid) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+
+        const token = jwt.sign({ id: data.id, nome: data.nome, email: data.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ success: true, user: { id: data.id, nome: data.nome, email: data.email }, token });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Extrair dados com IA (sem inserir no banco)
 app.post('/api/extract', upload.single('file'), async (req, res) => {
     try {
@@ -108,13 +162,23 @@ app.get('/api/requisicoes/next-number', async (_req, res) => {
 });
 
 // Listar Requisições
-app.get('/api/requisicoes', async (_req, res) => {
+app.get('/api/requisicoes', async (req, res) => {
     try {
-        const { data, error } = await supabase
-            .from('requisicoes')
-            .select('*')
-            .order('id', { ascending: false });
+        const authHeader = req.headers.authorization;
+        let userId = null;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            try { userId = (jwt.verify(token, JWT_SECRET) as any).id; } 
+            catch { return res.status(401).json({ error: 'Sessão expirada.' }); }
+        }
 
+        let query = supabase.from('requisicoes').select('*').order('id', { ascending: false });
+        // Se houver um usuário logado no portal (Bearer token), filtra apenas os pedidos dele
+        if (userId) {
+            query = query.eq('usuario_id', userId);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         res.json(data);
     } catch (err: any) {
@@ -129,6 +193,17 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
         }
 
+        let userId = null;
+        let userName = null;
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET) as any;
+                userId = decoded.id;
+                userName = decoded.nome;
+            } catch {}
+        }
+
         // 1. Extração Multimodal com Gemini (Buffer)
         const extractedData = await extractDataFromFile(req.file.buffer, req.file.mimetype);
 
@@ -136,7 +211,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         const { data, error } = await supabase
             .from('requisicoes')
             .insert([{
-                engenheiro: extractedData.solicitante || extractedData.engenheiro || 'Desconhecido',
+                usuario_id: userId,
+                engenheiro: extractedData.solicitante || extractedData.engenheiro || userName || 'Desconhecido',
                 data: extractedData.data || new Date().toLocaleDateString('pt-BR'),
                 numero_solicitacao: extractedData.numero_solicitacao || 'NOVO',
                 previsao_chegada: extractedData.previsao_chegada || null,
@@ -175,11 +251,23 @@ app.post('/api/requisicoes/bulk-delete', async (req, res) => {
 // Criar Requisição
 app.post('/api/requisicoes', async (req, res) => {
     try {
+        let userId = null;
+        let userName = null;
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET) as any;
+                userId = decoded.id;
+                userName = decoded.nome;
+            } catch {}
+        }
+
         const payload = req.body;
         const { data, error } = await supabase
             .from('requisicoes')
             .insert([{
-                engenheiro:          payload.engenheiro          || 'Desconhecido',
+                usuario_id:          userId,
+                engenheiro:          payload.engenheiro          || userName || 'Desconhecido',
                 data:                payload.data                || new Date().toLocaleDateString('pt-BR'),
                 numero_solicitacao:  payload.numero_solicitacao  || 'NOVO',
                 numero_pedido:       payload.numero_pedido       || null,

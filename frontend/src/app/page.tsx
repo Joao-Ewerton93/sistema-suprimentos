@@ -1,397 +1,284 @@
 "use client";
+import React, { useState, useEffect, useCallback } from 'react';
 
-import React, { useState, useEffect } from 'react';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const SOLICITANTES = ['Glaybson','Thaynara','Elluard','Emanuele','Maria Clara','Flavia','Francisco','Leonardo','Murilo'];
+const UNIDADES = ['UND','M','M²','M³','KG','L','CX','PCT','PR','GL'];
 
-type Requisicao = {
-  id: number;
-  engenheiro: string;
-  data: string;
-  numero_solicitacao: string;
-  status_solicitacao: string;
-  numero_pedido: string | null;
-  status_pedido: string | null;
-  status_final: string | null;
-  previsao_chegada: string | null;
+type Item = { descricao: string; unidade: string; quantidade: number; };
+type Req  = { id: number; engenheiro: string; data: string; numero_solicitacao: string; status_solicitacao: string; status_final: string | null; };
+
+const STATUS_MAP: Record<string, {label:string;dot:string;text:string}> = {
+  pendente:     {label:'Pendente',   dot:'bg-amber-400 animate-pulse', text:'text-amber-400'},
+  aprovado:     {label:'Aprovado',   dot:'bg-emerald-500',             text:'text-emerald-400'},
+  chegada_obra: {label:'A Caminho',  dot:'bg-indigo-500',              text:'text-indigo-400'},
+  finalizado:   {label:'Finalizado', dot:'bg-teal-500',                text:'text-teal-400'},
+  aguardando:   {label:'Aguardando', dot:'bg-slate-500 animate-pulse', text:'text-slate-400'},
 };
 
-export default function Dashboard() {
-  const [requisicoes, setRequisicoes] = useState<Requisicao[]>([]);
-  const [filter, setFilter] = useState('todos');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const res = await fetch('http://localhost:3001/api/requisicoes');
-      if (res.ok) {
-        const data = await res.json();
-        // Ordena por ID crescente para a sequência 1, 2, 3 ficar lógica de cima pra baixo,
-        // ou se quiser manter os novos no topo, você pode usar data.
-        setRequisicoes(data);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const res = await fetch('http://localhost:3001/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      if (res.ok) fetchData();
-    } catch (error) { console.error("Erro no upload", error); }
-  };
-
-  const aprovarRequisicao = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await fetch(`http://localhost:3001/api/requisicoes/${id}/aprovar_pedido`, { method: 'PUT' });
-      fetchData();
-    } catch(e) { console.error(e); }
-  };
-
-  const concluirRequisicao = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await fetch(`http://localhost:3001/api/requisicoes/${id}/concluir`, { method: 'PUT' });
-      fetchData();
-    } catch(e) { console.error(e); }
-  };
-
-  const excluirRequisicao = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm('Deseja realmente excluir esta requisição?')) return;
-    try {
-      await fetch(`http://localhost:3001/api/requisicoes/${id}`, { method: 'DELETE' });
-      // Remover do selection se estiver
-      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
-      fetchData();
-    } catch(e) { console.error(e); }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
-    if (!confirm(`Deseja excluir as ${selectedIds.length} requisições selecionadas?`)) return;
-    try {
-      await fetch('http://localhost:3001/api/requisicoes/bulk-delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedIds })
-      });
-      setSelectedIds([]);
-      fetchData();
-    } catch(e) { console.error(e); }
-  };
-
-  const criarNovaRequisicao = async () => {
-    try {
-      await fetch(`http://localhost:3001/api/requisicoes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-           engenheiro: '',
-           data: new Date().toLocaleDateString('pt-BR'),
-           numero_solicitacao: '',
-           status_solicitacao: 'pendente',
-           status_final: 'aguardando'
-        })
-      });
-      fetchData();
-    } catch(e) { console.error(e); }
-  };
-
-  const updateField = async (id: number, field: string, value: string) => {
-    // Atualização otimista na tela (Muda instantaneamente na hora que clica)
-    setRequisicoes(prev => prev.map(r => {
-      if (r.id === id) {
-        let updated = { ...r, [field]: value };
-        // Auto-aprovação ao preencher numero_pedido ou finalizar pedido
-        if (field === 'numero_pedido' && value.trim() !== '') {
-          updated.status_solicitacao = 'aprovado';
-        }
-        if (field === 'status_final' && value === 'finalizado') {
-          updated.status_solicitacao = 'aprovado';
-        }
-        return updated;
-      }
-      return r;
-    }));
-    
-    try {
-      let payload: any = { [field]: value };
-      if (field === 'numero_pedido' && value.trim() !== '') {
-        payload.status_solicitacao = 'aprovado';
-      }
-      if (field === 'status_final' && value === 'finalizado') {
-        payload.status_solicitacao = 'aprovado';
-      }
-
-      await fetch(`http://localhost:3001/api/requisicoes/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch(e) { console.error(e); }
-  };
-
-  // Atualiza o estado local IMEDIATAMENTE enquanto o usuário digita
-  const handleLocalChange = (id: number, field: string, value: string) => {
-    setRequisicoes(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
-  };
-
-  const toggleSelect = (id: number) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-  const filteredRequisicoes = requisicoes.filter(r => {
-    if (filter === 'todos') return true;
-    return r.status_solicitacao === filter;
-  });
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === filteredRequisicoes.length && filteredRequisicoes.length > 0) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredRequisicoes.map(r => r.id));
-    }
-  };
-
-  const metrics = {
-    pendente: requisicoes.filter(r => r.status_solicitacao === 'pendente').length,
-    em_cotacao: requisicoes.filter(r => r.status_solicitacao === 'em_cotacao').length,
-    aguardando_aprovacao: requisicoes.filter(r => r.status_solicitacao === 'aguardando_aprovacao').length,
-    aprovado: requisicoes.filter(r => r.status_solicitacao === 'aprovado').length,
-    a_caminho: requisicoes.filter(r => r.status_final === 'chegada_obra').length,
-    finalizado: requisicoes.filter(r => r.status_final === 'finalizado').length,
-    total: requisicoes.length,
-  };
-
+function StatusBadge({ status }: { status: string | null }) {
+  const s = STATUS_MAP[status ?? 'aguardando'] ?? STATUS_MAP['aguardando'];
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans relative overflow-hidden" translate="no">
-      {/* Topbar */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#161b2e] border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-sm shadow-lg shadow-blue-500/20">📦</div>
-          <div>
-            <h1 className="text-sm font-semibold text-slate-100 tracking-wide">SupplyFlow</h1>
-            <p className="text-[10px] text-slate-500">Sistema Kanban de Suprimentos</p>
-          </div>
-        </div>
-        <div className="flex gap-2 items-center">
-          
-          {selectedIds.length > 0 && (
-            <button 
-              onClick={handleBulkDelete} 
-              className="flex items-center justify-center w-8 h-8 rounded-md bg-red-600/20 text-red-500 border border-red-500/30 hover:bg-red-600/40 transition-all shadow-sm mr-2"
-              title="Excluir Selecionados"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-          )}
-
-          <button onClick={criarNovaRequisicao} className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs font-medium hover:bg-emerald-600/30 transition-all shadow-sm">
-            + Novo Pedido
-          </button>
-          <label className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-800/80 text-blue-200 border border-blue-500/50 text-xs cursor-pointer hover:bg-blue-600 transition-colors shadow-sm">
-            <input type="file" className="hidden" onChange={handleFileUpload} />
-            Importar IA
-          </label>
-        </div>
-      </header>
-
-      {/* Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-5">
-        <MetricCard label="Total de Pedidos" value={metrics.total} colorClass="text-blue-400" badge="Ativos" />
-        <MetricCard label="Pendentes" value={metrics.pendente} colorClass="text-slate-400" badge="Aguardando Ação" />
-        <MetricCard label="Aprovados" value={metrics.aprovado} colorClass="text-emerald-400" badge="Solicitação" />
-        <MetricCard label="Pedidos a Caminho" value={metrics.a_caminho} colorClass="text-cyan-400" badge="Em Trânsito" />
-        <MetricCard label="Finalizados" value={metrics.finalizado} colorClass="text-teal-400" badge="Entregues" />
-      </div>
-
-      {/* Toolbar Filters */}
-      <div className="flex gap-2 px-5 pb-3">
-        {['todos', 'pendente', 'em_cotacao', 'aguardando_aprovacao', 'aprovado'].map(f => (
-          <button 
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`text-xs px-4 py-1.5 rounded-full border transition-all duration-300 font-medium ${
-              filter === f 
-                ? 'bg-blue-500/20 border-blue-500 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.15)]' 
-                : 'bg-transparent border-white/5 text-slate-500 hover:text-slate-300 hover:bg-white/5'
-            }`}
-          >
-            {f === 'todos' ? 'Todos' : f.replace('_', ' ').toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      {/* Table */}
-      <div className="px-5 pb-6 overflow-x-auto">
-        <table className="w-full text-left text-xs whitespace-nowrap">
-          <thead>
-            <tr className="bg-[#161b2e] text-slate-500 uppercase tracking-wider text-[10px]">
-              <th className="p-0 w-1 rounded-l-lg"></th>
-              <th className="px-3 py-3 w-8">
-                <input 
-                  type="checkbox" 
-                  checked={selectedIds.length === filteredRequisicoes.length && filteredRequisicoes.length > 0} 
-                  onChange={toggleSelectAll} 
-                  className="w-3.5 h-3.5 rounded border-white/20 bg-[#0f1117] accent-blue-500 cursor-pointer" 
-                />
-              </th>
-              <th className="px-3 py-3 font-semibold text-left w-20">Nº DA REQUISIÇÃO</th>
-              <th className="px-3 py-3 font-semibold text-left w-48">Engenheiro</th>
-              <th className="px-3 py-3 font-semibold text-left w-28">Data</th>
-              <th className="px-3 py-3 font-semibold text-left w-32">Nº Solicitação</th>
-              <th className="px-3 py-3 font-semibold text-left w-36">STATUS</th>
-              <th className="px-3 py-3 font-semibold text-left w-32">Nº Pedido</th>
-              <th className="px-3 py-3 font-semibold text-left w-40">STATUS ENTREGA</th>
-              <th className="px-3 py-3 font-semibold text-left rounded-r-lg w-full">AÇÕES</th>
-            </tr>
-          </thead>
-          <tbody className="before:block before:h-2">
-            {filteredRequisicoes.map((r, index) => {
-              // Sequência sempre de 1, 2, 3... independente do ID no banco
-              const sequenceNum = String(index + 1).padStart(3, '0');
-              const isFinalizado = r.status_final === 'finalizado';
-              
-              return (
-                <tr key={r.id} className={`border-b border-white/5 transition-colors group ${isFinalizado ? 'opacity-60 bg-black/40' : 'hover:bg-white/5'}`}>
-                  <td className="p-0"><div className="w-[3px] h-10 bg-blue-500 rounded-sm scale-y-75 group-hover:scale-y-100 transition-transform"></div></td>
-                  
-                  <td className="px-3 py-3">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedIds.includes(r.id)} 
-                      onChange={() => toggleSelect(r.id)} 
-                      className="w-3.5 h-3.5 rounded border-white/20 bg-[#0f1117] accent-blue-500 cursor-pointer" 
-                    />
-                  </td>
-
-                  <td className="px-3 py-3 text-slate-400 font-mono">#{sequenceNum}</td>
-                  
-                  <td className="px-3 py-3 text-slate-200 font-medium">
-                    <input 
-                      type="text"
-                      disabled={isFinalizado}
-                      value={r.engenheiro}
-                      onChange={e => handleLocalChange(r.id, 'engenheiro', e.target.value)}
-                      onBlur={e => updateField(r.id, 'engenheiro', e.target.value)}
-                      className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 focus:bg-[#0f1117] disabled:bg-transparent disabled:cursor-not-allowed transition-all outline-none w-full px-1 py-0.5 rounded-sm"
-                      placeholder="Ex: Glaybson"
-                    />
-                  </td>
-                  
-                  <td className="px-3 py-3 text-slate-500 font-mono">
-                    <input 
-                      type="text"
-                      disabled={isFinalizado}
-                      value={r.data}
-                      onChange={e => handleLocalChange(r.id, 'data', e.target.value)}
-                      onBlur={e => updateField(r.id, 'data', e.target.value)}
-                      className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 focus:bg-[#0f1117] disabled:bg-transparent disabled:cursor-not-allowed transition-all outline-none w-24 px-1 py-0.5 rounded-sm"
-                    />
-                  </td>
-                  
-                  <td className="px-3 py-3 text-slate-500 font-mono">
-                    <input 
-                      type="text"
-                      disabled={isFinalizado}
-                      value={r.numero_solicitacao}
-                      onChange={e => handleLocalChange(r.id, 'numero_solicitacao', e.target.value)}
-                      onBlur={e => updateField(r.id, 'numero_solicitacao', e.target.value)}
-                      className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 focus:bg-[#0f1117] disabled:bg-transparent disabled:cursor-not-allowed transition-all outline-none w-24 px-1 py-0.5 rounded-sm"
-                    />
-                  </td>
-                  
-                  <td className="px-3 py-3">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/20 hover:border-white/20 transition-all">
-                      <span className={`w-1.5 h-1.5 rounded-full ${r.status_solicitacao === 'aprovado' ? 'bg-emerald-500' : 'bg-slate-400 animate-pulse'}`}></span>
-                      <select 
-                        disabled={isFinalizado}
-                        value={r.status_solicitacao || 'pendente'}
-                        onChange={e => updateField(r.id, 'status_solicitacao', e.target.value)}
-                        className={`bg-transparent outline-none text-[10px] font-medium cursor-pointer disabled:cursor-not-allowed appearance-none pr-4 ${r.status_solicitacao === 'aprovado' ? 'text-emerald-400' : 'text-slate-400'}`}
-                      >
-                        <option className="bg-[#161b2e] text-slate-400" value="pendente">Pendente</option>
-                        <option className="bg-[#161b2e] text-emerald-400" value="aprovado">Aprovado</option>
-                      </select>
-                    </div>
-                  </td>
-                  
-                  <td className="px-3 py-3 text-slate-500 font-mono">
-                    <input 
-                      type="text"
-                      disabled={isFinalizado}
-                      value={r.numero_pedido || ''}
-                      onChange={e => handleLocalChange(r.id, 'numero_pedido', e.target.value)}
-                      onBlur={e => updateField(r.id, 'numero_pedido', e.target.value)}
-                      className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 focus:bg-[#0f1117] disabled:bg-transparent disabled:cursor-not-allowed transition-all outline-none w-24 px-1 py-0.5 rounded-sm"
-                      placeholder="—"
-                    />
-                  </td>
-                  
-                  <td className="px-3 py-3">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/20 hover:border-white/20 transition-all">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isFinalizado ? 'bg-emerald-500' : r.status_final === 'chegada_obra' ? 'bg-indigo-500' : 'bg-slate-500 animate-pulse'}`}></span>
-                      <select 
-                        disabled={isFinalizado}
-                        value={r.status_final || 'aguardando'}
-                        onChange={e => updateField(r.id, 'status_final', e.target.value)}
-                        className={`bg-transparent outline-none text-[10px] font-medium cursor-pointer disabled:cursor-not-allowed appearance-none pr-4 ${isFinalizado ? 'text-emerald-400' : r.status_final === 'chegada_obra' ? 'text-indigo-400' : 'text-slate-400'}`}
-                      >
-                        <option className="bg-[#161b2e] text-slate-400" value="aguardando">Aguardando...</option>
-                        <option className="bg-[#161b2e] text-indigo-400" value="chegada_obra">Chegada em Obra</option>
-                        <option className="bg-[#161b2e] text-emerald-400" value="finalizado">Pedido Finalizado</option>
-                      </select>
-                    </div>
-                  </td>
-                  
-                  <td className="px-3 py-3">
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => updateField(r.id, 'status_final', 'finalizado')} 
-                        disabled={isFinalizado}
-                        className={`px-3 py-1.5 rounded text-[10px] font-medium transition-colors border whitespace-nowrap ${isFinalizado ? 'bg-emerald-500/10 text-emerald-600/50 border-emerald-500/10 cursor-not-allowed' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 border-emerald-500/20'}`}
-                      >
-                        {isFinalizado ? '✓ Finalizado' : 'Finalizar Pedido'}
-                      </button>
-                      
-                      <button onClick={(e) => excluirRequisicao(r.id, e)} className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1.5 rounded transition-all ml-1" title="Excluir individualmente">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/30 border border-white/5">
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}/>
+      <span className={`text-[10px] font-medium ${s.text}`}>{s.label}</span>
+    </span>
   );
 }
 
-function MetricCard({ label, value, colorClass, badge, isWarn = false }: any) {
+const EMPTY_ITEM: Item = { descricao:'', unidade:'UND', quantidade:1 };
+const cellCls = "border border-white/10";
+const inputCls = "bg-transparent w-full outline-none text-slate-200 placeholder-slate-700 text-xs px-3 py-2";
+
+export default function UserPortal() {
+  const [reqs, setReqs]           = useState<Req[]>([]);
+  const [nextNum, setNextNum]     = useState('...');
+  const [today]                   = useState(new Date().toLocaleDateString('pt-BR'));
+
+  const [obra, setObra]           = useState('SALG EXCLUSIVE RESORT');
+  const [cc]                      = useState('PS-021');
+  const [local, setLocal]         = useState('');
+  const [area, setArea]           = useState('');
+  const [solicitante, setSol]     = useState('');
+  const [destino, setDestino]     = useState('');
+  const [responsavel, setResp]    = useState('');
+  const [itens, setItens]         = useState<Item[]>([{ ...EMPTY_ITEM }]);
+
+  const [loading, setLoading]     = useState(false);
+  const [success, setSuccess]     = useState(false);
+  const [error, setError]         = useState('');
+
+  const fetchReqs = useCallback(async () => {
+    try { const r = await fetch(`${API_URL}/api/requisicoes`); if(r.ok) setReqs(await r.json()); } catch {}
+  }, []);
+
+  const fetchNext = useCallback(async () => {
+    try { const r = await fetch(`${API_URL}/api/requisicoes/next-number`); if(r.ok) { const j=await r.json(); setNextNum(j.number); } } catch {}
+  }, []);
+
+  useEffect(() => { fetchReqs(); fetchNext(); }, [fetchReqs, fetchNext]);
+
+  const addItem    = () => setItens(p => [...p, { ...EMPTY_ITEM }]);
+  const removeItem = (i: number) => setItens(p => p.filter((_,idx) => idx!==i));
+  const setItem    = (i: number, f: keyof Item, v: string|number) =>
+    setItens(p => p.map((it,idx) => idx===i ? {...it,[f]:v} : it));
+
+  const reset = () => {
+    setItens([{...EMPTY_ITEM}]); setSol(''); setLocal('');
+    setArea(''); setDestino(''); setResp(''); setError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); setError('');
+    if (!solicitante) { setError('Selecione o solicitante.'); return; }
+    if (itens.some(i => !i.descricao.trim())) { setError('Preencha a descrição de todos os itens.'); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/requisicoes`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          engenheiro: solicitante, data: today,
+          numero_solicitacao: nextNum, obra,
+          centro_custo: cc, local_obra: local,
+          area_atividade: area, itens: JSON.stringify(itens),
+          destino, responsavel, status_solicitacao:'pendente',
+        }),
+      });
+      if (!res.ok) throw new Error('Erro ao enviar');
+      setSuccess(true); reset(); fetchReqs(); fetchNext();
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err:any) { setError(err.message); }
+    finally { setLoading(false); }
+  };
+
   return (
-    <div className="bg-[#161b2e] border border-white/5 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-white/10 transition-all">
-      <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-medium">{label}</div>
-      <div className={`text-2xl font-semibold tracking-tight ${colorClass}`}>{value}</div>
-      <span className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 text-[10px] font-medium rounded-full border ${isWarn ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
-        {isWarn && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>}
-        {badge}
-      </span>
+    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans">
+
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 bg-[#161b2e] border-b border-white/5 sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Gestão de Suprimentos" className="h-10 w-auto object-contain" />
+          <div>
+            <h1 className="text-sm font-semibold text-slate-100">Gestão de Suprimentos</h1>
+            <p className="text-[10px] text-slate-500">Portal do Engenheiro</p>
+          </div>
+        </div>
+        <a href="/admin" className="text-[10px] text-slate-600 hover:text-slate-300 border border-white/5 hover:border-white/15 px-3 py-1.5 rounded-lg transition-all">Painel Admin →</a>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-5 py-10 space-y-12">
+
+        {/* ── FORMULÁRIO ── */}
+        <section>
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-slate-100">Nova Requisição de Material</h2>
+            <p className="text-xs text-slate-500 mt-1">Preencha o formulário e clique em enviar. O número é gerado automaticamente.</p>
+          </div>
+
+          {success ? (
+            <div className="border-2 border-emerald-500/30 rounded-2xl p-16 bg-emerald-500/5 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-3xl">✓</div>
+              <p className="text-base font-semibold text-emerald-400">Requisição enviada com sucesso!</p>
+              <p className="text-xs text-slate-600 mt-2">Acompanhe o status na tabela abaixo</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="rounded-2xl overflow-hidden border border-white/10 text-xs">
+
+                {/* Cabeçalho */}
+                <div className="grid grid-cols-[1fr_auto] bg-[#1a2540] border-b border-white/10">
+                  <div className="px-5 py-3 flex items-center gap-3">
+                    <img src="/logo.png" alt="Gestão de Suprimentos" className="h-7 w-auto object-contain" />
+                    <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">Pernambuco Construtora</span>
+                  </div>
+                  <div className="px-6 py-3 border-l border-white/10 text-right">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Requisição de Material Nº</p>
+                    <p className="text-lg font-bold text-blue-400 font-mono leading-tight">{nextNum}</p>
+                  </div>
+                </div>
+
+                {/* Obra / CC / Data */}
+                <div className="grid grid-cols-[1fr_100px_160px] border-b border-white/10">
+                  <div className={`${cellCls} flex items-center border-l-0 border-t-0`}>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase px-3 whitespace-nowrap">Obra:</span>
+                    <input value={obra} onChange={e=>setObra(e.target.value)} placeholder="Nome da obra" className={inputCls} />
+                  </div>
+                  <div className={`${cellCls} flex items-center justify-center border-t-0`}>
+                    <span className="text-sm font-bold text-blue-300 font-mono">{cc}</span>
+                  </div>
+                  <div className={`${cellCls} flex items-center gap-2 px-4 border-t-0 border-r-0`}>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase whitespace-nowrap">Data:</span>
+                    <span className="text-slate-300 font-mono">{today}</span>
+                  </div>
+                </div>
+
+                {/* Local / Área */}
+                <div className="grid grid-cols-2 border-b border-white/10">
+                  <div className={`${cellCls} flex items-center border-l-0 border-t-0`}>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase px-3 whitespace-nowrap">Local:</span>
+                    <input value={local} onChange={e=>setLocal(e.target.value)} placeholder="Ex: Bangalô Tradicional" className={inputCls} />
+                  </div>
+                  <div className={`${cellCls} flex items-center border-t-0 border-r-0`}>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase px-3 whitespace-nowrap">Área / Atividade:</span>
+                    <input value={area} onChange={e=>setArea(e.target.value)} placeholder="Ex: Acabamento" className={inputCls} />
+                  </div>
+                </div>
+
+                {/* Header tabela itens */}
+                <div className="grid grid-cols-[1fr_90px_100px_90px_90px] bg-[#1a2540] border-b border-white/10">
+                  {['Descrição','Unidade','Quantidade','Total','Obra'].map(h => (
+                    <div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>
+                  ))}
+                </div>
+
+                {/* Linhas de itens */}
+                {itens.map((it, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_90px_100px_90px_90px] border-b border-white/10 group hover:bg-white/3 transition-colors">
+                    <div className="border-r border-white/10 flex items-center">
+                      <input value={it.descricao} onChange={e=>setItem(i,'descricao',e.target.value)}
+                        placeholder="Descrição do material..." className={`${inputCls} flex-1`} />
+                      {itens.length > 1 && (
+                        <button type="button" onClick={()=>removeItem(i)} className="opacity-0 group-hover:opacity-100 px-2 text-red-400 hover:text-red-300 text-base leading-none transition-opacity">×</button>
+                      )}
+                    </div>
+                    <div className="border-r border-white/10">
+                      <select value={it.unidade} onChange={e=>setItem(i,'unidade',e.target.value)}
+                        className="bg-transparent w-full h-full outline-none text-slate-300 text-xs px-3 py-2 cursor-pointer">
+                        {UNIDADES.map(u=><option key={u} className="bg-[#1a2540]" value={u}>{u}</option>)}
+                      </select>
+                    </div>
+                    <div className="border-r border-white/10">
+                      <input type="number" min={1} value={it.quantidade} onChange={e=>setItem(i,'quantidade',Number(e.target.value))}
+                        className={`${inputCls} text-center`} />
+                    </div>
+                    <div className="border-r border-white/10 flex items-center justify-center text-slate-500 font-mono">
+                      {it.quantidade.toFixed(2)}
+                    </div>
+                    <div className="flex items-center px-3 text-slate-500 font-mono">{cc}</div>
+                  </div>
+                ))}
+
+                {/* Adicionar item */}
+                <div className="border-b border-white/10">
+                  <button type="button" onClick={addItem}
+                    className="w-full px-4 py-2.5 text-[11px] text-blue-400 hover:text-blue-300 hover:bg-blue-500/5 transition-colors text-left flex items-center gap-2">
+                    <span className="text-base leading-none font-bold">+</span> Adicionar item
+                  </button>
+                </div>
+
+                {/* Header rodapé */}
+                <div className="grid grid-cols-3 bg-[#1a2540] border-b border-white/10">
+                  {['Solicitante','Destino','Responsável'].map(h=>(
+                    <div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>
+                  ))}
+                </div>
+
+                {/* Rodapé */}
+                <div className="grid grid-cols-3">
+                  <div className={`${cellCls} border-l-0 border-b-0`}>
+                    <select required value={solicitante} onChange={e=>setSol(e.target.value)}
+                      className="bg-transparent w-full h-full outline-none text-slate-200 text-xs px-3 py-3 cursor-pointer appearance-none">
+                      <option className="bg-[#1a2540]" value="">— Selecione —</option>
+                      {SOLICITANTES.map(s=><option key={s} className="bg-[#1a2540]" value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div className={`${cellCls} border-b-0`}>
+                    <input value={destino} onChange={e=>setDestino(e.target.value)} placeholder="Destino..." className={inputCls} />
+                  </div>
+                  <div className={`${cellCls} border-r-0 border-b-0`}>
+                    <input value={responsavel} onChange={e=>setResp(e.target.value)} placeholder="Responsável..." className={inputCls} />
+                  </div>
+                </div>
+              </div>
+
+              {error && <p className="mt-3 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">✕ {error}</p>}
+
+              <div className="flex gap-3 mt-4">
+                <button type="submit" disabled={loading}
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-50">
+                  {loading ? 'Enviando...' : '✓ Enviar Requisição'}
+                </button>
+                <button type="button" onClick={reset}
+                  className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-sm transition-colors">
+                  Limpar
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
+
+        {/* ── ACOMPANHAMENTO ── */}
+        <section>
+          <h2 className="text-base font-semibold text-slate-100 mb-1">Acompanhamento</h2>
+          <p className="text-xs text-slate-500 mb-5">Status de todas as suas requisições em tempo real.</p>
+          <div className="bg-[#161b2e] border border-white/5 rounded-2xl overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-white/5 text-slate-500 text-[10px] uppercase tracking-wider">
+                  {['Nº','Solicitante','Nº Requisição','Data','Status Solicitação','Status Entrega'].map(h=>(
+                    <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {reqs.length === 0 && (
+                  <tr><td colSpan={6} className="text-center py-12 text-slate-700">Nenhuma requisição encontrada.</td></tr>
+                )}
+                {reqs.map((r, i) => (
+                  <tr key={r.id} className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors">
+                    <td className="px-5 py-3 text-slate-600 font-mono">#{String(i+1).padStart(3,'0')}</td>
+                    <td className="px-5 py-3 text-slate-300 font-medium">{r.engenheiro||'—'}</td>
+                    <td className="px-5 py-3 text-slate-500 font-mono">{r.numero_solicitacao||'—'}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.data||'—'}</td>
+                    <td className="px-5 py-3"><StatusBadge status={r.status_solicitacao}/></td>
+                    <td className="px-5 py-3"><StatusBadge status={r.status_final}/></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

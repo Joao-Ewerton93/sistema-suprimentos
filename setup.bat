@@ -1,19 +1,21 @@
 @echo off
 echo ==========================================
-echo Instalando dependencias do Backend...
+echo   SupplyFlow - Instalando Dependencias
 echo ==========================================
-cd backend
+echo.
+
+echo [1/2] Instalando dependencias do Backend...
+cd /d "%~dp0backend"
+call npm install
+
+echo.
+echo [2/2] Instalando dependencias do Frontend...
+cd /d "%~dp0frontend"
 call npm install
 
 echo.
 echo ==========================================
-echo Criando o Frontend (Next.js + Tailwind)...
-echo ==========================================
-cd ..
-call npx -y create-next-app@latest frontend --typescript --tailwind --eslint --app --src-dir --import-alias="@/*" --use-npm
-
-echo.
-echo ==========================================
-echo Tudo pronto!
+echo   Tudo pronto! Execute o run.bat para
+echo   iniciar o sistema.
 echo ==========================================
 pause

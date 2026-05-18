@@ -293,16 +293,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
               Excluir ({selectedIds.length})
             </button>
           )}
-          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#161b2e] text-slate-400 border border-white/8 hover:border-blue-500/40 hover:text-blue-400 text-xs font-medium cursor-pointer transition-all">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-            Importar IA
-            <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" className="hidden" onChange={handleFileUpload} />
-          </label>
-          <button onClick={criarNovaRequisicao} disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 text-xs font-medium transition-all disabled:opacity-50">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Novo Pedido
-          </button>
+
         </div>
       </div>
 

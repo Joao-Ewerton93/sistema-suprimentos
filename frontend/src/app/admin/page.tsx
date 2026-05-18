@@ -13,6 +13,7 @@ type Requisicao = {
   destino?: string | null; responsavel?: string | null;
 };
 type Toast = { id: number; message: string; type: 'success' | 'error' };
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ── PASSWORD GATE ──────────────────────────────────────────────────
 function PasswordGate({ onAuth }: { onAuth: () => void }) {
@@ -36,25 +37,25 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex items-center justify-center font-sans">
       <div className="w-full max-w-sm px-6">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="Gestão de Suprimentos" className="h-20 w-auto object-contain mx-auto mb-4" />
-          <h1 className="text-lg font-semibold text-slate-100">Gestão de Suprimentos</h1>
+          <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Gestão de Suprimentos</h1>
           <p className="text-xs text-slate-500 mt-1">Painel Administrativo</p>
         </div>
-        <form onSubmit={handleLogin} className="bg-[#161b2e] border border-white/8 rounded-2xl p-6 space-y-4">
+        <form onSubmit={handleLogin} className="bg-white dark:bg-[#161b2e] border border-slate-300 dark:border-white/8 rounded-2xl p-6 space-y-4">
           <div>
             <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Senha de acesso</label>
             <input
               type="password" value={pwd} onChange={e => setPwd(e.target.value)}
               placeholder="••••••••" autoFocus
-              className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700"
+              className="w-full bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700"
             />
           </div>
           {error && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">✕ {error}</p>}
           <button type="submit" disabled={loading || !pwd}
-            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition-colors">
+            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white dark:text-white text-sm font-medium transition-colors">
             {loading ? 'Verificando...' : 'Entrar'}
           </button>
         </form>
@@ -79,7 +80,7 @@ export default function AdminPage() {
     }).then(r => r.json()).then(j => setAuthed(!!j.valid)).catch(() => setAuthed(false));
   }, []);
 
-  if (authed === null) return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+  if (authed === null) return <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   if (!authed) return <PasswordGate onAuth={() => setAuthed(true)} />;
   return <Dashboard onLogout={() => { sessionStorage.removeItem('sf_token'); setAuthed(false); }} />;
 }
@@ -207,10 +208,10 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
     finalizado: requisicoes.filter(r => r.status_final === 'finalizado').length,
   };
 
-  const inputCls = "bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 focus:bg-[#0f1117] disabled:cursor-not-allowed transition-all outline-none px-1 py-0.5 rounded-sm";
+  const inputCls = "bg-transparent border-b border-transparent hover:border-slate-200 dark:border-white/10 focus:border-blue-500 focus:bg-slate-50 dark:bg-[#0f1117] disabled:cursor-not-allowed transition-all outline-none px-1 py-0.5 rounded-sm";
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans" translate="no">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-800 dark:text-slate-200 font-sans" translate="no">
 
       {/* Toasts */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
@@ -224,16 +225,18 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
       {loading && <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-blue-500/20"><div className="h-full bg-blue-500 animate-pulse w-full" /></div>}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#161b2e] border-b border-white/5">
+      <header className="flex items-center justify-between px-5 py-3 bg-white dark:bg-[#161b2e] border-b border-slate-200 dark:border-white/5">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="Gestão de Suprimentos" className="h-9 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Painel Administrativo</p>
           </div>
         </div>
         {/* Navegação */}
         <nav className="flex items-center gap-1">
+          <ThemeToggle />
+          <div className="w-px h-5 bg-white/8 mx-2" />
           <a href="/admin"
             className="flex items-center gap-1.5 text-[10px] text-blue-400 bg-blue-500/10 border border-blue-500/30 px-3 py-1.5 rounded-lg font-medium">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -250,8 +253,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             Relatórios
           </a>
           <div className="w-px h-5 bg-white/8 mx-1" />
-          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-400 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
-          <button onClick={onLogout} className="text-[10px] text-slate-600 hover:text-red-400 hover:border-red-500/20 border border-white/5 px-3 py-1.5 rounded-lg transition-all">Sair</button>
+          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
+          <button onClick={onLogout} className="text-[10px] text-slate-600 hover:text-red-400 hover:border-red-500/20 border border-slate-200 dark:border-white/5 px-3 py-1.5 rounded-lg transition-all">Sair</button>
         </nav>
       </header>
 
@@ -264,7 +267,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
           { label: 'A Caminho', value: metrics.a_caminho, color: 'text-indigo-400', badge: 'Em Trânsito' },
           { label: 'Finalizados', value: metrics.finalizado, color: 'text-teal-400', badge: 'Entregues' },
         ].map(({ label, value, color, badge }) => (
-          <div key={label} className="bg-[#161b2e] border border-white/5 rounded-xl p-4 hover:border-white/10 transition-all">
+          <div key={label} className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-xl p-4 hover:border-slate-200 dark:border-white/10 transition-all">
             <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-medium">{label}</div>
             <div className={`text-2xl font-semibold ${color}`}>{value}</div>
             <span className="inline-flex items-center mt-2 px-2.5 py-0.5 text-[10px] font-medium rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">{badge}</span>
@@ -279,7 +282,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
           {['todos', 'pendente', 'aprovado'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium
-                ${filter === f ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'bg-transparent border-white/5 text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
+                ${filter === f ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'bg-transparent border-slate-200 dark:border-white/5 text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-white/5'}`}>
               {f === 'todos' ? 'Todos' : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
@@ -301,7 +304,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
       <div className="px-5 pb-6 overflow-x-auto">
         <table className="w-full text-left text-xs whitespace-nowrap">
           <thead>
-            <tr className="bg-[#161b2e] text-slate-500 uppercase tracking-wider text-[10px]">
+            <tr className="bg-white dark:bg-[#161b2e] text-slate-500 uppercase tracking-wider text-[10px]">
               <th className="p-0 w-1 rounded-l-lg" />
               <th className="px-3 py-3 w-8">
                 <input type="checkbox" checked={selectedIds.length === filteredReqs.length && filteredReqs.length > 0}
@@ -329,7 +332,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
               try { parsedItens = JSON.parse(r.itens || '[]'); } catch {}
               return (
                 <React.Fragment key={r.id}>
-                <tr className={`border-b border-white/5 transition-colors group ${isFin ? 'opacity-60 bg-black/30' : isExpanded ? 'bg-blue-500/5' : 'hover:bg-white/5'}`}>
+                <tr className={`border-b border-slate-200 dark:border-white/5 transition-colors group ${isFin ? 'opacity-60 bg-slate-100 dark:bg-black/30' : isExpanded ? 'bg-blue-500/5' : 'hover:bg-slate-100 dark:bg-white/5'}`}>
                   <td className="p-0"><div className={`w-[3px] h-10 rounded-sm transition-all ${isExpanded ? 'bg-blue-400 scale-y-100' : 'bg-blue-500 scale-y-75 group-hover:scale-y-100'}`} /></td>
                   <td className="px-3 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={() => toggleSelect(r.id)} className="w-3.5 h-3.5 accent-blue-500 cursor-pointer" /></td>
                   <td className="px-2 py-3">
@@ -345,7 +348,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                     <input type="text" disabled={isFin} value={r.engenheiro} placeholder="Engenheiro"
                       onChange={e => handleLocal(r.id, 'engenheiro', e.target.value)}
                       onBlur={e => updateField(r.id, 'engenheiro', e.target.value)}
-                      className={`${inputCls} w-full text-slate-200`} />
+                      className={`${inputCls} w-full text-slate-800 dark:text-slate-200`} />
                   </td>
                   <td className="px-3 py-3">
                     <input type="text" disabled={isFin} value={r.data}
@@ -360,13 +363,13 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                       className={`${inputCls} w-24 text-slate-500 font-mono`} />
                   </td>
                   <td className="px-3 py-3">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/20">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/5 bg-slate-200 dark:bg-black/20">
                       <span className={`w-1.5 h-1.5 rounded-full ${r.status_solicitacao === 'aprovado' ? 'bg-emerald-500' : 'bg-amber-400 animate-pulse'}`} />
                       <select disabled={isFin} value={r.status_solicitacao || 'pendente'}
                         onChange={e => updateField(r.id, 'status_solicitacao', e.target.value)}
                         className={`bg-transparent outline-none text-[10px] font-medium cursor-pointer disabled:cursor-not-allowed appearance-none pr-3 ${r.status_solicitacao === 'aprovado' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        <option className="bg-[#161b2e]" value="pendente">Pendente</option>
-                        <option className="bg-[#161b2e]" value="aprovado">Aprovado</option>
+                        <option className="bg-white dark:bg-[#161b2e]" value="pendente">Pendente</option>
+                        <option className="bg-white dark:bg-[#161b2e]" value="aprovado">Aprovado</option>
                       </select>
                     </div>
                   </td>
@@ -377,14 +380,14 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                       className={`${inputCls} w-24 text-slate-500 font-mono`} />
                   </td>
                   <td className="px-3 py-3">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/20">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/5 bg-slate-200 dark:bg-black/20">
                       <span className={`w-1.5 h-1.5 rounded-full ${isFin ? 'bg-teal-500' : r.status_final === 'chegada_obra' ? 'bg-indigo-500' : 'bg-slate-500 animate-pulse'}`} />
                       <select disabled={isFin} value={r.status_final || 'aguardando'}
                         onChange={e => updateField(r.id, 'status_final', e.target.value)}
-                        className={`bg-transparent outline-none text-[10px] font-medium cursor-pointer disabled:cursor-not-allowed appearance-none pr-3 ${isFin ? 'text-teal-400' : r.status_final === 'chegada_obra' ? 'text-indigo-400' : 'text-slate-400'}`}>
-                        <option className="bg-[#161b2e]" value="aguardando">Aguardando...</option>
-                        <option className="bg-[#161b2e]" value="chegada_obra">Chegada em Obra</option>
-                        <option className="bg-[#161b2e]" value="finalizado">Pedido Finalizado</option>
+                        className={`bg-transparent outline-none text-[10px] font-medium cursor-pointer disabled:cursor-not-allowed appearance-none pr-3 ${isFin ? 'text-teal-400' : r.status_final === 'chegada_obra' ? 'text-indigo-400' : 'text-slate-600 dark:text-slate-400'}`}>
+                        <option className="bg-white dark:bg-[#161b2e]" value="aguardando">Aguardando...</option>
+                        <option className="bg-white dark:bg-[#161b2e]" value="chegada_obra">Chegada em Obra</option>
+                        <option className="bg-white dark:bg-[#161b2e]" value="finalizado">Pedido Finalizado</option>
                       </select>
                     </div>
                   </td>
@@ -409,20 +412,20 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                       <div className="space-y-3">
                         {/* Info da obra */}
                         <div className="flex flex-wrap gap-4 text-[10px]">
-                          {r.obra && <span className="text-slate-500">🏗 <span className="text-slate-300 font-medium">{r.obra}</span></span>}
+                          {r.obra && <span className="text-slate-500">🏗 <span className="text-slate-700 dark:text-slate-300 font-medium">{r.obra}</span></span>}
                           {r.centro_custo && <span className="text-slate-500">📌 <span className="text-blue-300 font-mono font-semibold">{r.centro_custo}</span></span>}
-                          {r.local_obra && <span className="text-slate-500">📍 Local: <span className="text-slate-300">{r.local_obra}</span></span>}
-                          {r.area_atividade && <span className="text-slate-500">🔧 Área: <span className="text-slate-300">{r.area_atividade}</span></span>}
-                          {r.destino && <span className="text-slate-500">📦 Destino: <span className="text-slate-300">{r.destino}</span></span>}
-                          {r.responsavel && <span className="text-slate-500">👤 Responsável: <span className="text-slate-300">{r.responsavel}</span></span>}
+                          {r.local_obra && <span className="text-slate-500">📍 Local: <span className="text-slate-700 dark:text-slate-300">{r.local_obra}</span></span>}
+                          {r.area_atividade && <span className="text-slate-500">🔧 Área: <span className="text-slate-700 dark:text-slate-300">{r.area_atividade}</span></span>}
+                          {r.destino && <span className="text-slate-500">📦 Destino: <span className="text-slate-700 dark:text-slate-300">{r.destino}</span></span>}
+                          {r.responsavel && <span className="text-slate-500">👤 Responsável: <span className="text-slate-700 dark:text-slate-300">{r.responsavel}</span></span>}
                         </div>
 
                         {/* Tabela de itens */}
                         {parsedItens.length > 0 ? (
-                          <div className="rounded-lg overflow-hidden border border-white/8">
+                          <div className="rounded-lg overflow-hidden border border-slate-300 dark:border-white/8">
                             <table className="w-full text-[11px]">
                               <thead>
-                                <tr className="bg-[#161b2e] text-slate-500 uppercase tracking-wider">
+                                <tr className="bg-white dark:bg-[#161b2e] text-slate-500 uppercase tracking-wider">
                                   <th className="px-3 py-2 text-left font-semibold">Descrição</th>
                                   <th className="px-3 py-2 text-center font-semibold w-20">Unidade</th>
                                   <th className="px-3 py-2 text-center font-semibold w-24">Quantidade</th>
@@ -430,10 +433,10 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
                               </thead>
                               <tbody>
                                 {parsedItens.map((it, idx) => (
-                                  <tr key={idx} className="border-t border-white/5 hover:bg-white/3 transition-colors">
-                                    <td className="px-3 py-2 text-slate-300">{it.descricao || '—'}</td>
+                                  <tr key={idx} className="border-t border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/3 transition-colors">
+                                    <td className="px-3 py-2 text-slate-700 dark:text-slate-300">{it.descricao || '—'}</td>
                                     <td className="px-3 py-2 text-center text-slate-500 font-mono">{it.unidade}</td>
-                                    <td className="px-3 py-2 text-center text-slate-400 font-mono">{it.quantidade}</td>
+                                    <td className="px-3 py-2 text-center text-slate-600 dark:text-slate-400 font-mono">{it.quantidade}</td>
                                   </tr>
                                 ))}
                               </tbody>

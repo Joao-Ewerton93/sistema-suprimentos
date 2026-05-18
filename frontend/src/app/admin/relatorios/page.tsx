@@ -30,7 +30,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [ok]);
 
   if (ok === null || ok === false)
-    return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+    return <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   return <>{children}</>;
 }
 
@@ -274,10 +274,10 @@ function RelatoriosPage() {
     finally { setExporting(null); }
   };
 
-  const inputCls = "bg-[#0f1117] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-blue-500 transition-all w-full placeholder-slate-700";
+  const inputCls = "bg-slate-50 dark:bg-[#0f1117] border border-slate-300 dark:border-white/8 rounded-lg px-3 py-2 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500 transition-all w-full placeholder-slate-400 dark:placeholder-slate-700";
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans" translate="no">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-800 dark:text-slate-200 font-sans" translate="no">
 
       {/* Toast */}
       {toast && (
@@ -288,19 +288,19 @@ function RelatoriosPage() {
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#161b2e] border-b border-white/5">
+      <header className="flex items-center justify-between px-5 py-3 bg-white dark:bg-[#161b2e] border-b border-slate-200 dark:border-white/5">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Relatórios e Exportação</p>
           </div>
         </div>
         <div className="flex gap-2 items-center">
-          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all">
+          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg transition-all">
             ← Painel Admin
           </a>
-          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-400 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
+          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
         </div>
       </header>
 
@@ -309,7 +309,7 @@ function RelatoriosPage() {
         {/* Título */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">Relatório de Requisições</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Relatório de Requisições</h2>
             <p className="text-[11px] text-slate-500 mt-0.5">Filtre, visualize e exporte os dados em PDF ou Excel</p>
           </div>
           <div className="flex gap-2">
@@ -333,7 +333,7 @@ function RelatoriosPage() {
         </div>
 
         {/* Filtros */}
-        <div className="bg-[#161b2e] border border-white/5 rounded-xl p-4">
+        <div className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-xl p-4">
           <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-3 font-medium">Filtros</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
@@ -360,7 +360,7 @@ function RelatoriosPage() {
           </div>
           {(filtroStatus !== 'todos' || filtroEngenheiro || filtroDataInicio || filtroDataFim) && (
             <button onClick={() => { setFiltroStatus('todos'); setFiltroEngenheiro(''); setFiltroDataInicio(''); setFiltroDataFim(''); }}
-              className="mt-3 text-[10px] text-slate-600 hover:text-slate-400 underline transition-colors">
+              className="mt-3 text-[10px] text-slate-600 hover:text-slate-600 dark:text-slate-400 underline transition-colors">
               Limpar filtros
             </button>
           )}
@@ -375,7 +375,7 @@ function RelatoriosPage() {
             { label: 'A Caminho', value: metrics.a_caminho, color: 'text-indigo-400', border: 'border-indigo-500/20' },
             { label: 'Finalizados', value: metrics.finalizado, color: 'text-teal-400', border: 'border-teal-500/20' },
           ].map(({ label, value, color, border }) => (
-            <div key={label} className={`bg-[#161b2e] border ${border} rounded-xl p-4`}>
+            <div key={label} className={`bg-white dark:bg-[#161b2e] border ${border} rounded-xl p-4`}>
               <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{label}</div>
               <div className={`text-2xl font-semibold ${color}`}>{value}</div>
             </div>
@@ -383,15 +383,15 @@ function RelatoriosPage() {
         </div>
 
         {/* Tabela de preview */}
-        <div className="bg-[#161b2e] border border-white/5 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-            <p className="text-xs font-medium text-slate-300">Pré-visualização — {filtered.length} registro(s)</p>
+        <div className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-white/5">
+            <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Pré-visualização — {filtered.length} registro(s)</p>
             {loading && <span className="text-[10px] text-slate-600 animate-pulse">Carregando...</span>}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs whitespace-nowrap">
               <thead>
-                <tr className="text-slate-500 uppercase tracking-wider text-[10px] border-b border-white/5">
+                <tr className="text-slate-500 uppercase tracking-wider text-[10px] border-b border-slate-200 dark:border-white/5">
                   <th className="px-4 py-3 w-12">Nº</th>
                   <th className="px-4 py-3">Engenheiro</th>
                   <th className="px-4 py-3">Data</th>
@@ -416,16 +416,16 @@ function RelatoriosPage() {
                     'Pendente': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
                   };
                   return (
-                    <tr key={r.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
+                    <tr key={r.id} className="border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/3 transition-colors">
                       <td className="px-4 py-2.5 text-slate-600 font-mono">#{String(i + 1).padStart(3, '0')}</td>
-                      <td className="px-4 py-2.5 text-slate-200">{r.engenheiro || '—'}</td>
+                      <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200">{r.engenheiro || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.data || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.numero_solicitacao || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.numero_pedido || '—'}</td>
                       <td className="px-4 py-2.5">
                         <span className={`inline-flex px-2 py-0.5 rounded-full border text-[10px] font-medium ${stColor[st]}`}>{st}</span>
                       </td>
-                      <td className="px-4 py-2.5 text-slate-400 max-w-[180px] truncate">{r.obra || '—'}</td>
+                      <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400 max-w-[180px] truncate">{r.obra || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.centro_custo || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 font-mono">{r.previsao_chegada || '—'}</td>
                     </tr>

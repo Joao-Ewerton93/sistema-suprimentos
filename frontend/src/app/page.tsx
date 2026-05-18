@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const UNIDADES = ['UND','M','M²','M³','KG','L','CX','PCT','PR','GL'];
@@ -13,13 +14,13 @@ const STATUS_MAP: Record<string, {label:string;dot:string;text:string}> = {
   aprovado:     {label:'Aprovado',   dot:'bg-emerald-500',             text:'text-emerald-400'},
   chegada_obra: {label:'A Caminho',  dot:'bg-indigo-500',              text:'text-indigo-400'},
   finalizado:   {label:'Finalizado', dot:'bg-teal-500',                text:'text-teal-400'},
-  aguardando:   {label:'Aguardando', dot:'bg-slate-500 animate-pulse', text:'text-slate-400'},
+  aguardando:   {label:'Aguardando', dot:'bg-slate-500 animate-pulse', text:'text-slate-600 dark:text-slate-400'},
 };
 
 function StatusBadge({ status }: { status: string | null }) {
   const s = STATUS_MAP[status ?? 'aguardando'] ?? STATUS_MAP['aguardando'];
   return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/30 border border-white/5">
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/5">
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}/>
       <span className={`text-[10px] font-medium ${s.text}`}>{s.label}</span>
     </span>
@@ -27,8 +28,8 @@ function StatusBadge({ status }: { status: string | null }) {
 }
 
 const EMPTY_ITEM: Item = { descricao:'', unidade:'UND', quantidade:1 };
-const cellCls = "border border-white/10";
-const inputCls = "bg-transparent w-full outline-none text-slate-200 placeholder-slate-700 text-xs px-3 py-2";
+const cellCls = "border border-slate-200 dark:border-white/10";
+const inputCls = "bg-transparent w-full outline-none text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-700 text-xs px-3 py-2";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -78,64 +79,64 @@ export default function App() {
     setToken(null); setUser(null);
   };
 
-  if (!isClient) return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+  if (!isClient) return <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
 
   // ── TELA DE LOGIN / REGISTRO ──
   if (!token) {
     const isLogin = authMode === 'login';
     return (
-      <div className="min-h-screen bg-[#0f1117] flex flex-col font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex flex-col font-sans relative overflow-hidden">
         {/* Glow de fundo */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
         
         <header className="flex items-center justify-between px-6 py-4 relative z-10">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
-            <span className="text-sm font-semibold text-slate-100">Gestão de Suprimentos</span>
+            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">Gestão de Suprimentos</span>
           </div>
-          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors">Acesso Administrativo →</a>
+          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors">Acesso Administrativo →</a>
         </header>
 
         <main className="flex-1 flex items-center justify-center p-4 relative z-10">
           <div className="w-full max-w-sm">
             <div className="text-center mb-8">
-              <h1 className="text-xl font-semibold text-slate-100 mb-1">{isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
-              <p className="text-xs text-slate-400">Portal de Requisição de Materiais</p>
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1">{isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Portal de Requisição de Materiais</p>
             </div>
             
-            <form onSubmit={handleAuth} className="bg-[#161b2e]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <form onSubmit={handleAuth} className="bg-white dark:bg-[#161b2e]/80 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-2xl p-6 space-y-4 shadow-2xl">
               {!isLogin && (
                 <div>
                   <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
                   <input type="text" required value={nome} onChange={e => setNome(e.target.value)}
                     placeholder="João da Silva" autoFocus
-                    className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                    className="w-full bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700" />
                 </div>
               )}
               <div>
                 <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Usuário de Login</label>
                 <input type="text" required value={usuario} onChange={e => setUsuario(e.target.value)}
                   placeholder="Seu usuário" autoFocus={isLogin}
-                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                  className="w-full bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Senha</label>
                 <input type="password" required value={senha} onChange={e => setSenha(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                  className="w-full bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700" />
               </div>
 
               {error && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">✕ {error}</p>}
               
               <button type="submit" disabled={loading}
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition-colors mt-2">
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white dark:text-white text-sm font-medium transition-colors mt-2">
                 {loading ? 'Aguarde...' : isLogin ? 'Entrar' : 'Cadastrar e Entrar'}
               </button>
             </form>
 
             <div className="text-center mt-6">
               <button onClick={() => { setAuthMode(isLogin ? 'register' : 'login'); setError(''); }}
-                className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors">
                 {isLogin ? 'Primeiro acesso? Crie sua conta' : 'Já tem uma conta? Faça login'}
               </button>
             </div>
@@ -205,23 +206,24 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans">
-      <header className="flex items-center justify-between px-6 py-4 bg-[#161b2e] border-b border-white/5 sticky top-0 z-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-800 dark:text-slate-200 font-sans">
+      <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#161b2e] border-b border-slate-200 dark:border-white/5 sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="Gestão de Suprimentos" className="h-10 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-slate-100">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Portal do Engenheiro</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-500/30">
               {user.nome.charAt(0).toUpperCase()}
             </div>
             <div className="hidden sm:block">
               <div className="flex items-center gap-1.5">
-                <p className="text-[11px] text-slate-300 font-medium">{user.nome}</p>
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 font-medium">{user.nome}</p>
                 {user.role === 'admin' && (
                   <span className="bg-emerald-500/20 text-emerald-400 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Admin</span>
                 )}
@@ -229,8 +231,8 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
               <button onClick={onLogout} className="text-[9px] text-red-400 hover:underline">Sair da conta</button>
             </div>
           </div>
-          <div className="w-px h-5 bg-white/10 hidden sm:block" />
-          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/15 px-3 py-1.5 rounded-lg transition-all hidden sm:block">Admin →</a>
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/10 hidden sm:block" />
+          <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:border-white/15 px-3 py-1.5 rounded-lg transition-all hidden sm:block">Admin →</a>
         </div>
       </header>
 
@@ -238,7 +240,7 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
         <section>
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">Nova Requisição de Material</h2>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Nova Requisição de Material</h2>
               <p className="text-xs text-slate-500 mt-1">Preencha o formulário e clique em enviar. O número é gerado automaticamente.</p>
             </div>
           </div>
@@ -251,20 +253,20 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <div className="rounded-2xl overflow-hidden border border-white/10 text-xs">
+              <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 text-xs">
                 {/* Cabeçalho Formulário */}
-                <div className="grid grid-cols-[1fr_auto] bg-[#1a2540] border-b border-white/10">
+                <div className="grid grid-cols-[1fr_auto] bg-slate-100 dark:bg-[#1a2540] border-b border-slate-200 dark:border-white/10">
                   <div className="px-5 py-3 flex items-center gap-3">
                     <img src="/logo.png" alt="logo" className="h-7 w-auto object-contain" />
-                    <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">Pernambuco Construtora</span>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 tracking-wide uppercase">Pernambuco Construtora</span>
                   </div>
-                  <div className="px-6 py-3 border-l border-white/10 text-right">
+                  <div className="px-6 py-3 border-l border-slate-200 dark:border-white/10 text-right">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider">Requisição de Material Nº</p>
                     <p className="text-lg font-bold text-blue-400 font-mono leading-tight">{nextNum}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[1fr_100px_160px] border-b border-white/10">
+                <div className="grid grid-cols-[1fr_100px_160px] border-b border-slate-200 dark:border-white/10">
                   <div className={`${cellCls} flex items-center border-l-0 border-t-0`}>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase px-3 whitespace-nowrap">Obra:</span>
                     <input value={obra} onChange={e=>setObra(e.target.value)} placeholder="Nome da obra" className={inputCls} />
@@ -274,11 +276,11 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                   </div>
                   <div className={`${cellCls} flex items-center gap-2 px-4 border-t-0 border-r-0`}>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase whitespace-nowrap">Data:</span>
-                    <span className="text-slate-300 font-mono">{today}</span>
+                    <span className="text-slate-700 dark:text-slate-300 font-mono">{today}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 border-b border-white/10">
+                <div className="grid grid-cols-2 border-b border-slate-200 dark:border-white/10">
                   <div className={`${cellCls} flex items-center border-l-0 border-t-0`}>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase px-3 whitespace-nowrap">Local:</span>
                     <input value={local} onChange={e=>setLocal(e.target.value)} placeholder="Ex: Bangalô Tradicional" className={inputCls} />
@@ -289,39 +291,39 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[1fr_90px_100px_90px_90px] bg-[#1a2540] border-b border-white/10">
-                  {['Descrição','Unidade','Quantidade','Total','Obra'].map(h => <div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>)}
+                <div className="grid grid-cols-[1fr_90px_100px_90px_90px] bg-slate-100 dark:bg-[#1a2540] border-b border-slate-200 dark:border-white/10">
+                  {['Descrição','Unidade','Quantidade','Total','Obra'].map(h => <div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider border-r border-slate-200 dark:border-white/10 last:border-r-0">{h}</div>)}
                 </div>
 
                 {itens.map((it, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_90px_100px_90px_90px] border-b border-white/10 group hover:bg-white/3 transition-colors">
-                    <div className="border-r border-white/10 flex items-center">
+                  <div key={i} className="grid grid-cols-[1fr_90px_100px_90px_90px] border-b border-slate-200 dark:border-white/10 group hover:bg-slate-50 dark:hover:bg-white/3 transition-colors">
+                    <div className="border-r border-slate-200 dark:border-white/10 flex items-center">
                       <input value={it.descricao} onChange={e=>setItem(i,'descricao',e.target.value)} placeholder="Descrição do material..." className={`${inputCls} flex-1`} />
                       {itens.length > 1 && <button type="button" onClick={()=>removeItem(i)} className="opacity-0 group-hover:opacity-100 px-2 text-red-400 hover:text-red-300 text-base leading-none transition-opacity">×</button>}
                     </div>
-                    <div className="border-r border-white/10">
-                      <select value={it.unidade} onChange={e=>setItem(i,'unidade',e.target.value)} className="bg-transparent w-full h-full outline-none text-slate-300 text-xs px-3 py-2 cursor-pointer">
-                        {UNIDADES.map(u=><option key={u} className="bg-[#1a2540]" value={u}>{u}</option>)}
+                    <div className="border-r border-slate-200 dark:border-white/10">
+                      <select value={it.unidade} onChange={e=>setItem(i,'unidade',e.target.value)} className="bg-transparent w-full h-full outline-none text-slate-700 dark:text-slate-300 text-xs px-3 py-2 cursor-pointer">
+                        {UNIDADES.map(u=><option key={u} className="bg-slate-100 dark:bg-[#1a2540]" value={u}>{u}</option>)}
                       </select>
                     </div>
-                    <div className="border-r border-white/10">
+                    <div className="border-r border-slate-200 dark:border-white/10">
                       <input type="number" min={1} value={it.quantidade} onChange={e=>setItem(i,'quantidade',Number(e.target.value))} className={`${inputCls} text-center`} />
                     </div>
-                    <div className="border-r border-white/10 flex items-center justify-center text-slate-500 font-mono">{it.quantidade.toFixed(2)}</div>
+                    <div className="border-r border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 font-mono">{it.quantidade.toFixed(2)}</div>
                     <div className="flex items-center px-3 text-slate-500 font-mono">{cc}</div>
                   </div>
                 ))}
 
-                <div className="border-b border-white/10">
+                <div className="border-b border-slate-200 dark:border-white/10">
                   <button type="button" onClick={addItem} className="w-full px-4 py-2.5 text-[11px] text-blue-400 hover:text-blue-300 hover:bg-blue-500/5 transition-colors text-left flex items-center gap-2"><span className="text-base leading-none font-bold">+</span> Adicionar item</button>
                 </div>
 
-                <div className="grid grid-cols-3 bg-[#1a2540] border-b border-white/10">
-                  {['Solicitante','Destino','Responsável'].map(h=><div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>)}
+                <div className="grid grid-cols-3 bg-slate-100 dark:bg-[#1a2540] border-b border-slate-200 dark:border-white/10">
+                  {['Solicitante','Destino','Responsável'].map(h=><div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider border-r border-slate-200 dark:border-white/10 last:border-r-0">{h}</div>)}
                 </div>
 
                 <div className="grid grid-cols-3">
-                  <div className={`${cellCls} border-l-0 border-b-0 flex items-center px-3 text-slate-400 text-xs bg-black/20`}>
+                  <div className={`${cellCls} border-l-0 border-b-0 flex items-center px-3 text-slate-600 dark:text-slate-400 text-xs bg-slate-200 dark:bg-black/20`}>
                     {user.nome}
                   </div>
                   <div className={`${cellCls} border-b-0`}>
@@ -336,31 +338,31 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
               {error && <p className="mt-3 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">✕ {error}</p>}
 
               <div className="flex gap-3 mt-4">
-                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white dark:text-white text-sm font-semibold transition-colors disabled:opacity-50">
                   {loading ? 'Enviando...' : '✓ Enviar Requisição'}
                 </button>
-                <button type="button" onClick={reset} className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-sm transition-colors">Limpar</button>
+                <button type="button" onClick={reset} className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 text-sm transition-colors">Limpar</button>
               </div>
             </form>
           )}
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-slate-100 mb-1">{user.role === 'admin' ? 'Todas as Requisições' : 'Meu Histórico de Pedidos'}</h2>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-1">{user.role === 'admin' ? 'Todas as Requisições' : 'Meu Histórico de Pedidos'}</h2>
           <p className="text-xs text-slate-500 mb-5">{user.role === 'admin' ? 'Visão de administrador. Exibindo requisições de todos os engenheiros.' : 'Suas requisições enviadas ao painel administrativo.'}</p>
-          <div className="bg-[#161b2e] border border-white/5 rounded-2xl overflow-hidden">
+          <div className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-white/5 text-slate-500 text-[10px] uppercase tracking-wider">
+                <tr className="border-b border-slate-200 dark:border-white/5 text-slate-500 text-[10px] uppercase tracking-wider">
                   {['Nº','Nº Requisição','Data','Status Solicitação','Status Entrega'].map(h=><th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {reqs.length === 0 && <tr><td colSpan={5} className="text-center py-12 text-slate-700">Nenhuma requisição encontrada no seu histórico.</td></tr>}
                 {reqs.map((r, i) => (
-                  <tr key={r.id} className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors">
+                  <tr key={r.id} className="border-b border-slate-200 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/3 transition-colors">
                     <td className="px-5 py-3 text-slate-600 font-mono">#{String(i+1).padStart(3,'0')}</td>
-                    <td className="px-5 py-3 text-slate-300 font-mono">{r.numero_solicitacao||'—'}</td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-300 font-mono">{r.numero_solicitacao||'—'}</td>
                     <td className="px-5 py-3 text-slate-600">{r.data||'—'}</td>
                     <td className="px-5 py-3"><StatusBadge status={r.status_solicitacao}/></td>
                     <td className="px-5 py-3"><StatusBadge status={r.status_final}/></td>

@@ -28,7 +28,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [ok]);
 
   if (ok === null || ok === false)
-    return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+    return <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
   return <>{children}</>;
 }
 
@@ -105,10 +105,10 @@ function FornecedoresPage() {
     return matchBusca && matchCat;
   });
 
-  const inputCls = "w-full bg-[#0f1117] border border-white/8 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-blue-500 transition-all placeholder-slate-700";
+  const inputCls = "w-full bg-slate-50 dark:bg-[#0f1117] border border-slate-300 dark:border-white/8 rounded-lg px-3 py-2 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700";
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans" translate="no">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-800 dark:text-slate-200 font-sans" translate="no">
 
       {/* Toast */}
       {toast && (
@@ -119,11 +119,11 @@ function FornecedoresPage() {
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#161b2e] border-b border-white/5">
+      <header className="flex items-center justify-between px-5 py-3 bg-white dark:bg-[#161b2e] border-b border-slate-200 dark:border-white/5">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-wide">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Fornecedores</p>
           </div>
         </div>
@@ -141,9 +141,9 @@ function FornecedoresPage() {
             Relatórios
           </a>
           <div className="w-px h-5 bg-white/8 mx-1" />
-          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-400 border border-white/5 hover:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
+          <a href="/" className="text-[10px] text-slate-600 hover:text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg transition-all">Portal →</a>
           <button onClick={() => { sessionStorage.removeItem('sf_token'); window.location.href = '/admin'; }}
-            className="text-[10px] text-slate-600 hover:text-red-400 hover:border-red-500/20 border border-white/5 px-3 py-1.5 rounded-lg transition-all">Sair</button>
+            className="text-[10px] text-slate-600 hover:text-red-400 hover:border-red-500/20 border border-slate-200 dark:border-white/5 px-3 py-1.5 rounded-lg transition-all">Sair</button>
         </nav>
       </header>
 
@@ -152,7 +152,7 @@ function FornecedoresPage() {
         {/* Título + botão */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">Fornecedores</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Fornecedores</h2>
             <p className="text-[11px] text-slate-500 mt-0.5">{fornecedores.length} fornecedor(es) cadastrado(s)</p>
           </div>
           <button onClick={openCreate}
@@ -168,10 +168,10 @@ function FornecedoresPage() {
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" placeholder="Buscar por nome, CNPJ ou contato..." value={busca}
               onChange={e => setBusca(e.target.value)}
-              className="w-full bg-[#161b2e] border border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-300 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+              className="w-full bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500 transition-all placeholder-slate-400 dark:placeholder-slate-700" />
           </div>
           <select value={filtroCategoria} onChange={e => setFiltroCategoria(e.target.value)}
-            className="bg-[#161b2e] border border-white/5 rounded-lg px-3 py-2 text-xs text-slate-400 outline-none focus:border-blue-500 transition-all">
+            className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-xs text-slate-600 dark:text-slate-400 outline-none focus:border-blue-500 transition-all">
             <option value="todas">Todas as categorias</option>
             {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -191,14 +191,14 @@ function FornecedoresPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map(f => (
-              <div key={f.id} className="bg-[#161b2e] border border-white/5 rounded-xl p-4 hover:border-white/10 transition-all group">
+              <div key={f.id} className="bg-white dark:bg-[#161b2e] border border-slate-200 dark:border-white/5 rounded-xl p-4 hover:border-slate-200 dark:border-white/10 transition-all group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm shrink-0">
                       {f.nome.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-100 leading-tight">{f.nome}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-tight">{f.nome}</p>
                       {f.cnpj && <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.cnpj}</p>}
                     </div>
                   </div>
@@ -224,13 +224,13 @@ function FornecedoresPage() {
                   {f.contato && (
                     <div className="flex items-center gap-2 text-slate-500">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                      <span className="text-slate-400">{f.contato}</span>
+                      <span className="text-slate-600 dark:text-slate-400">{f.contato}</span>
                     </div>
                   )}
                   {f.telefone && (
                     <div className="flex items-center gap-2 text-slate-500">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.64a16 16 0 0 0 6 6l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      <span className="text-slate-400">{f.telefone}</span>
+                      <span className="text-slate-600 dark:text-slate-400">{f.telefone}</span>
                     </div>
                   )}
                   {f.email && (
@@ -252,12 +252,12 @@ function FornecedoresPage() {
       {/* Modal de cadastro/edição */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#161b2e] border border-white/8 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-              <h3 className="text-sm font-semibold text-slate-100">
+          <div className="bg-white dark:bg-[#161b2e] border border-slate-300 dark:border-white/8 rounded-2xl w-full max-w-lg shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/5">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {editando ? 'Editar Fornecedor' : 'Novo Fornecedor'}
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-600 hover:text-slate-300 transition-colors">
+              <button onClick={() => setShowModal(false)} className="text-slate-600 hover:text-slate-700 dark:text-slate-300 transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -304,7 +304,7 @@ function FornecedoresPage() {
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 py-2 rounded-lg border border-white/8 text-slate-500 hover:text-slate-300 text-xs transition-all">
+                  className="flex-1 py-2 rounded-lg border border-slate-300 dark:border-white/8 text-slate-500 hover:text-slate-700 dark:text-slate-300 text-xs transition-all">
                   Cancelar
                 </button>
                 <button type="submit" disabled={loading}
@@ -320,15 +320,15 @@ function FornecedoresPage() {
       {/* Modal de confirmação de exclusão */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#161b2e] border border-red-500/20 rounded-2xl w-full max-w-sm shadow-2xl p-5 text-center">
+          <div className="bg-white dark:bg-[#161b2e] border border-red-500/20 rounded-2xl w-full max-w-sm shadow-2xl p-5 text-center">
             <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-3">
               <svg width="20" height="20" className="text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </div>
-            <p className="text-sm font-semibold text-slate-100 mb-1">Excluir fornecedor?</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Excluir fornecedor?</p>
             <p className="text-xs text-slate-500 mb-4">"{confirmDelete.nome}" será removido permanentemente.</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDelete(null)}
-                className="flex-1 py-2 rounded-lg border border-white/8 text-slate-500 hover:text-slate-300 text-xs transition-all">
+                className="flex-1 py-2 rounded-lg border border-slate-300 dark:border-white/8 text-slate-500 hover:text-slate-700 dark:text-slate-300 text-xs transition-all">
                 Cancelar
               </button>
               <button onClick={() => handleDelete(confirmDelete)} disabled={loading}

@@ -282,6 +282,71 @@ app.delete('/api/requisicoes/:id', async (req, res) => {
     }
 });
 
+// ══════════════════════════════════════════════════════════
+// FORNECEDORES
+// ══════════════════════════════════════════════════════════
+
+// Listar Fornecedores
+app.get('/api/fornecedores', async (_req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('fornecedores')
+            .select('*')
+            .order('nome', { ascending: true });
+        if (error) throw error;
+        res.json(data);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Criar Fornecedor
+app.post('/api/fornecedores', async (req, res) => {
+    try {
+        const { nome, cnpj, contato, email, telefone, categoria, observacoes } = req.body;
+        if (!nome) return res.status(400).json({ error: 'O campo "nome" é obrigatório.' });
+        const { data, error } = await supabase
+            .from('fornecedores')
+            .insert([{ nome, cnpj: cnpj || null, contato: contato || null, email: email || null, telefone: telefone || null, categoria: categoria || null, observacoes: observacoes || null }])
+            .select();
+        if (error) throw error;
+        res.status(201).json({ success: true, fornecedor: data[0] });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Atualizar Fornecedor
+app.put('/api/fornecedores/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const { error } = await supabase
+            .from('fornecedores')
+            .update(updates)
+            .eq('id', id);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Excluir Fornecedor
+app.delete('/api/fornecedores/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase
+            .from('fornecedores')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Backend rodando na porta ${PORT}`);

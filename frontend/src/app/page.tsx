@@ -10,7 +10,7 @@ type User = { id: number; nome: string; usuario: string; role?: string; };
 
 const STATUS_MAP: Record<string, {label:string;dot:string;text:string}> = {
   pendente:     {label:'Pendente',   dot:'bg-amber-400 animate-pulse', text:'text-amber-400'},
-  aprovado:     {label:'Aprovado',   dot:'bg-emerald-500',             text:'text-emerald-400'},
+  aprovado:     {label:'Aprovado',   dot:'bg-[#b9f1d6]',             text:'text-[#b9f1d6]'},
   chegada_obra: {label:'A Caminho',  dot:'bg-indigo-500',              text:'text-indigo-400'},
   finalizado:   {label:'Finalizado', dot:'bg-teal-500',                text:'text-teal-400'},
   aguardando:   {label:'Aguardando', dot:'bg-slate-500 animate-pulse', text:'text-slate-400'},
@@ -28,7 +28,7 @@ function StatusBadge({ status }: { status: string | null }) {
 
 const EMPTY_ITEM: Item = { descricao:'', unidade:'UND', quantidade:1 };
 const cellCls = "border border-white/10";
-const inputCls = "bg-transparent w-full outline-none text-slate-200 placeholder-slate-700 text-xs px-3 py-2";
+const inputCls = "bg-transparent w-full outline-none text-[#f1f6ce]/90 placeholder-slate-700 text-xs px-3 py-2";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -78,20 +78,20 @@ export default function App() {
     setToken(null); setUser(null);
   };
 
-  if (!isClient) return <div className="min-h-screen bg-[#0f1117] flex items-center justify-center"><div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" /></div>;
+  if (!isClient) return <div className="min-h-screen bg-[#0d0f36] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#69d2cd]/30 border-t-blue-500 rounded-full animate-spin" /></div>;
 
   // ── TELA DE LOGIN / REGISTRO ──
   if (!token) {
     const isLogin = authMode === 'login';
     return (
-      <div className="min-h-screen bg-[#0f1117] flex flex-col font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-[#0d0f36] flex flex-col font-sans relative overflow-hidden">
         {/* Glow de fundo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[#69d2cd] text-[#0d0f36]/10 blur-[120px] rounded-[100%] pointer-events-none" />
         
         <header className="flex items-center justify-between px-6 py-4 relative z-10">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="logo" className="h-9 w-auto object-contain" />
-            <span className="text-sm font-semibold text-slate-100">Gestão de Suprimentos</span>
+            <span className="text-sm font-semibold text-[#f1f6ce]">Gestão de Suprimentos</span>
           </div>
           <a href="/admin" className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors">Acesso Administrativo →</a>
         </header>
@@ -99,36 +99,36 @@ export default function App() {
         <main className="flex-1 flex items-center justify-center p-4 relative z-10">
           <div className="w-full max-w-sm">
             <div className="text-center mb-8">
-              <h1 className="text-xl font-semibold text-slate-100 mb-1">{isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
+              <h1 className="text-xl font-semibold text-[#f1f6ce] mb-1">{isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
               <p className="text-xs text-slate-400">Portal de Requisição de Materiais</p>
             </div>
             
-            <form onSubmit={handleAuth} className="bg-[#161b2e]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <form onSubmit={handleAuth} className="bg-[#294380]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 space-y-4 shadow-2xl">
               {!isLogin && (
                 <div>
                   <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
                   <input type="text" required value={nome} onChange={e => setNome(e.target.value)}
                     placeholder="João da Silva" autoFocus
-                    className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                    className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-[#f1f6ce]/90 outline-none focus:border-[#69d2cd] transition-all placeholder-slate-700" />
                 </div>
               )}
               <div>
                 <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Usuário de Login</label>
                 <input type="text" required value={usuario} onChange={e => setUsuario(e.target.value)}
                   placeholder="Seu usuário" autoFocus={isLogin}
-                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-[#f1f6ce]/90 outline-none focus:border-[#69d2cd] transition-all placeholder-slate-700" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Senha</label>
                 <input type="password" required value={senha} onChange={e => setSenha(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-blue-500 transition-all placeholder-slate-700" />
+                  className="w-full bg-black/30 border border-white/8 rounded-lg px-4 py-2.5 text-sm text-[#f1f6ce]/90 outline-none focus:border-[#69d2cd] transition-all placeholder-slate-700" />
               </div>
 
               {error && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">✕ {error}</p>}
               
               <button type="submit" disabled={loading}
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition-colors mt-2">
+                className="w-full py-2.5 rounded-xl bg-[#69d2cd] text-[#0d0f36] hover:bg-[#b9f1d6] hover:text-[#0d0f36] disabled:opacity-40 text-white text-sm font-medium transition-colors mt-2">
                 {loading ? 'Aguarde...' : isLogin ? 'Entrar' : 'Cadastrar e Entrar'}
               </button>
             </form>
@@ -205,25 +205,25 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 font-sans">
-      <header className="flex items-center justify-between px-6 py-4 bg-[#161b2e] border-b border-white/5 sticky top-0 z-10">
+    <div className="min-h-screen bg-[#0d0f36] text-[#f1f6ce]/90 font-sans">
+      <header className="flex items-center justify-between px-6 py-4 bg-[#294380] border-b border-white/5 sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="Gestão de Suprimentos" className="h-10 w-auto object-contain" />
           <div>
-            <h1 className="text-sm font-semibold text-slate-100">Gestão de Suprimentos</h1>
+            <h1 className="text-sm font-semibold text-[#f1f6ce]">Gestão de Suprimentos</h1>
             <p className="text-[10px] text-slate-500">Portal do Engenheiro</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-500/30">
+            <div className="w-8 h-8 rounded-full bg-[#69d2cd] text-[#0d0f36]/20 text-[#69d2cd] flex items-center justify-center text-xs font-bold border border-[#69d2cd]/30">
               {user.nome.charAt(0).toUpperCase()}
             </div>
             <div className="hidden sm:block">
               <div className="flex items-center gap-1.5">
                 <p className="text-[11px] text-slate-300 font-medium">{user.nome}</p>
                 {user.role === 'admin' && (
-                  <span className="bg-emerald-500/20 text-emerald-400 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Admin</span>
+                  <span className="bg-[#b9f1d6]/20 text-[#b9f1d6] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Admin</span>
                 )}
               </div>
               <button onClick={onLogout} className="text-[9px] text-red-400 hover:underline">Sair da conta</button>
@@ -238,29 +238,29 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
         <section>
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">Nova Requisição de Material</h2>
+              <h2 className="text-base font-semibold text-[#f1f6ce]">Nova Requisição de Material</h2>
               <p className="text-xs text-slate-500 mt-1">Preencha o formulário e clique em enviar. O número é gerado automaticamente.</p>
             </div>
           </div>
 
           {success ? (
-            <div className="border-2 border-emerald-500/30 rounded-2xl p-16 bg-emerald-500/5 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-3xl">✓</div>
-              <p className="text-base font-semibold text-emerald-400">Requisição enviada com sucesso!</p>
+            <div className="border-2 border-[#b9f1d6]/30 rounded-2xl p-16 bg-[#b9f1d6]/5 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#b9f1d6]/10 border border-[#b9f1d6]/20 flex items-center justify-center text-3xl">✓</div>
+              <p className="text-base font-semibold text-[#b9f1d6]">Requisição enviada com sucesso!</p>
               <p className="text-xs text-slate-600 mt-2">Acompanhe o status na tabela abaixo</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="rounded-2xl overflow-hidden border border-white/10 text-xs">
                 {/* Cabeçalho Formulário */}
-                <div className="grid grid-cols-[1fr_auto] bg-[#1a2540] border-b border-white/10">
+                <div className="grid grid-cols-[1fr_auto] bg-[#294380]/80 border-b border-white/10">
                   <div className="px-5 py-3 flex items-center gap-3">
                     <img src="/logo.png" alt="logo" className="h-7 w-auto object-contain" />
                     <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">Pernambuco Construtora</span>
                   </div>
                   <div className="px-6 py-3 border-l border-white/10 text-right">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider">Requisição de Material Nº</p>
-                    <p className="text-lg font-bold text-blue-400 font-mono leading-tight">{nextNum}</p>
+                    <p className="text-lg font-bold text-[#69d2cd] font-mono leading-tight">{nextNum}</p>
                   </div>
                 </div>
 
@@ -270,7 +270,7 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                     <input value={obra} onChange={e=>setObra(e.target.value)} placeholder="Nome da obra" className={inputCls} />
                   </div>
                   <div className={`${cellCls} flex items-center justify-center border-t-0`}>
-                    <span className="text-sm font-bold text-blue-300 font-mono">{cc}</span>
+                    <span className="text-sm font-bold text-[#69d2cd]/80 font-mono">{cc}</span>
                   </div>
                   <div className={`${cellCls} flex items-center gap-2 px-4 border-t-0 border-r-0`}>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase whitespace-nowrap">Data:</span>
@@ -289,7 +289,7 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[1fr_90px_100px_90px_90px] bg-[#1a2540] border-b border-white/10">
+                <div className="grid grid-cols-[1fr_90px_100px_90px_90px] bg-[#294380]/80 border-b border-white/10">
                   {['Descrição','Unidade','Quantidade','Total','Obra'].map(h => <div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>)}
                 </div>
 
@@ -301,7 +301,7 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                     </div>
                     <div className="border-r border-white/10">
                       <select value={it.unidade} onChange={e=>setItem(i,'unidade',e.target.value)} className="bg-transparent w-full h-full outline-none text-slate-300 text-xs px-3 py-2 cursor-pointer">
-                        {UNIDADES.map(u=><option key={u} className="bg-[#1a2540]" value={u}>{u}</option>)}
+                        {UNIDADES.map(u=><option key={u} className="bg-[#294380]/80" value={u}>{u}</option>)}
                       </select>
                     </div>
                     <div className="border-r border-white/10">
@@ -313,10 +313,10 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
                 ))}
 
                 <div className="border-b border-white/10">
-                  <button type="button" onClick={addItem} className="w-full px-4 py-2.5 text-[11px] text-blue-400 hover:text-blue-300 hover:bg-blue-500/5 transition-colors text-left flex items-center gap-2"><span className="text-base leading-none font-bold">+</span> Adicionar item</button>
+                  <button type="button" onClick={addItem} className="w-full px-4 py-2.5 text-[11px] text-[#69d2cd] hover:text-[#69d2cd]/80 hover:bg-[#b9f1d6] hover:text-[#0d0f36]/5 transition-colors text-left flex items-center gap-2"><span className="text-base leading-none font-bold">+</span> Adicionar item</button>
                 </div>
 
-                <div className="grid grid-cols-3 bg-[#1a2540] border-b border-white/10">
+                <div className="grid grid-cols-3 bg-[#294380]/80 border-b border-white/10">
                   {['Solicitante','Destino','Responsável'].map(h=><div key={h} className="px-3 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-r border-white/10 last:border-r-0">{h}</div>)}
                 </div>
 
@@ -336,7 +336,7 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
               {error && <p className="mt-3 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">✕ {error}</p>}
 
               <div className="flex gap-3 mt-4">
-                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-[#69d2cd] text-[#0d0f36] hover:bg-[#b9f1d6] hover:text-[#0d0f36] text-white text-sm font-semibold transition-colors disabled:opacity-50">
                   {loading ? 'Enviando...' : '✓ Enviar Requisição'}
                 </button>
                 <button type="button" onClick={reset} className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-sm transition-colors">Limpar</button>
@@ -346,9 +346,9 @@ function PortalContent({ token, user, onLogout }: { token: string; user: User; o
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-slate-100 mb-1">{user.role === 'admin' ? 'Todas as Requisições' : 'Meu Histórico de Pedidos'}</h2>
+          <h2 className="text-base font-semibold text-[#f1f6ce] mb-1">{user.role === 'admin' ? 'Todas as Requisições' : 'Meu Histórico de Pedidos'}</h2>
           <p className="text-xs text-slate-500 mb-5">{user.role === 'admin' ? 'Visão de administrador. Exibindo requisições de todos os engenheiros.' : 'Suas requisições enviadas ao painel administrativo.'}</p>
-          <div className="bg-[#161b2e] border border-white/5 rounded-2xl overflow-hidden">
+          <div className="bg-[#294380] border border-white/5 rounded-2xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-white/5 text-slate-500 text-[10px] uppercase tracking-wider">
